@@ -16,6 +16,12 @@ export default function AuthPage() {
     password: z.string().min(6),
   });
 
+  const registerSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+    name: z.string(),
+  });
+
   if (user) {
     return (
       <div>
@@ -51,6 +57,20 @@ export default function AuthPage() {
           }}
         >
           <AutoFormSubmit>Login</AutoFormSubmit>
+        </AutoForm>
+      </Card>
+      <Card>
+        <AutoForm
+          formSchema={registerSchema}
+          onSubmit={({ email, password, name }) => {
+            try {
+              register(email, password, name);
+            } catch (error) {
+              toast.error(String(error));
+            }
+          }}
+        >
+          <AutoFormSubmit>Register</AutoFormSubmit>
         </AutoForm>
       </Card>
     </div>
