@@ -43,6 +43,7 @@ export const useAuthStore = create<AuthState>()(
         set({ loading: true, error: null });
         try {
           await account.create(ID.unique(), email, password, name);
+          await account.createVerification(email);
           await useAuthStore.getState().login(email, password);
         } catch (error) {
           set({ error: (error as Error).message, loading: false });

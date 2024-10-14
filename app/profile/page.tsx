@@ -40,6 +40,7 @@ export default function Profile() {
       fetchSessions();
       checkMfaStatus();
       setProfilePicture(user.prefs?.profilePictureUrl);
+      console.log(user.targets);
     }
   }, [user]);
 
@@ -51,20 +52,17 @@ export default function Profile() {
   };
 
   const uploadProfilePicture = async (file: File) => {
+    if (!user) {
+      return;
+    }
     try {
-      const fileId = ID.unique();
-      await storage.createFile(
-        "profilePicture", // Replace with your actual bucket ID
-        fileId,
-        file
-      );
+      const fileId = user.$id;
+      await storage.createFile("profilePicture", fileId, file);
 
       const fileUrl = storage.getFileView("profilePicture", fileId);
 
-      // Update user preferences with the new profile picture URL
       await account.updatePrefs({ profilePictureUrl: fileUrl });
 
-      // Update local user state
       updateProfilePicture(fileUrl);
 
       setProfilePicture(fileUrl);
@@ -131,7 +129,8 @@ export default function Profile() {
 
   const addIdentity = async (provider: OAuthProvider) => {
     try {
-      await account.createOAuth2Session(provider);
+      const location = window.location.href;
+      await account.createOAuth2Session(provider, location);
       toast.success(`${provider} account linked successfully!`);
     } catch (error) {
       console.error("Error adding identity:", error);
@@ -159,6 +158,11 @@ export default function Profile() {
     //   console.error("Error enabling MFA:", error);
     //   toast.error("Failed to enable MFA. Please try again.");
     // }
+  };
+
+  const isProviderLinked = (provider: OAuthProvider) => {
+    return user.targets.some((identity) => identity.name === provider);
+    user
   };
 
   return (
@@ -228,10 +232,16 @@ export default function Profile() {
               <CardTitle>Linked Accounts</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center gap-4">
-              <Button onClick={() => addIdentity(OAuthProvider.Github)}>
-                Link GitHub
+              <Button
+                onClick={() => addIdentity(OAuthProvider.Discord)}
+                disabled={isProviderLinked(OAuthProvider.Discord)}
+              >
+                Link Discord
               </Button>
-              <Button onClick={() => addIdentity(OAuthProvider.Google)}>
+              <Button
+                onClick={() => addIdentity(OAuthProvider.Google)}
+                disabled={isProviderLinked(OAuthProvider.Google)}
+              >
                 Link Google
               </Button>
             </CardContent>
