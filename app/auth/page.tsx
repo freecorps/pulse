@@ -160,6 +160,14 @@ export default function AuthPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <AutoForm
+                fieldConfig={{
+                  password: {
+                    inputProps: {
+                      type: "password",
+                      placeholder: "••••••••",
+                    },
+                  },
+                }}
                 className="flex flex-col gap-1"
                 formSchema={registerSchema}
                 onSubmit={({ email, password, name }) => {
