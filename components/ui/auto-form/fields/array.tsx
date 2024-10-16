@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import {
   AccordionContent,
   AccordionItem,
@@ -12,13 +13,13 @@ import { beautifyObjectName } from "../utils";
 import AutoFormObject from "./object";
 
 function isZodArray(
-  item: z.ZodArray<any> | z.ZodDefault<any>,
+  item: z.ZodArray<any> | z.ZodDefault<any>
 ): item is z.ZodArray<any> {
   return item instanceof z.ZodArray;
 }
 
 function isZodDefault(
-  item: z.ZodArray<any> | z.ZodDefault<any>,
+  item: z.ZodArray<any> | z.ZodDefault<any>
 ): item is z.ZodDefault<any> {
   return item instanceof z.ZodDefault;
 }

@@ -1,7 +1,7 @@
 "use client";
 import { z } from "zod";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import {
   Card,
@@ -13,7 +13,7 @@ import {
 import { useAuthStore } from "../stores/AuthStore";
 import { toast } from "sonner";
 
-function resetPasswordPage() {
+function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const secret = searchParams.get("secret");
   const userId = searchParams.get("userId");
@@ -66,60 +66,64 @@ function resetPasswordPage() {
 
   if (step === "newPassword") {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Card className="w-[400px]">
-          <CardHeader>
-            <CardTitle>Recuperar senha</CardTitle>
-            <CardDescription>
-              Insira o email da sua conta para recuperar a senha.
-            </CardDescription>
-            <CardContent>
-              <AutoForm
-                formSchema={newPasswordForm}
-                fieldConfig={{
-                  confirmPassword: {
-                    inputProps: {
-                      type: "password",
-                      placeholder: "••••••••",
-                    },
-                  },
-                  password: {
-                    inputProps: {
-                      type: "password",
-                      placeholder: "••••••••",
-                    },
-                  },
-                }}
-                onSubmit={changePassword}
-              >
-                <AutoFormSubmit disabled={loading}>Salvar</AutoFormSubmit>
-              </AutoForm>
-            </CardContent>
-          </CardHeader>
-        </Card>
-      </div>
+      <Card className="w-[400px]">
+        <CardHeader>
+          <CardTitle>Recuperar senha</CardTitle>
+          <CardDescription>Insira sua nova senha.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AutoForm
+            formSchema={newPasswordForm}
+            fieldConfig={{
+              confirmPassword: {
+                inputProps: {
+                  type: "password",
+                  placeholder: "••••••••",
+                },
+              },
+              password: {
+                inputProps: {
+                  type: "password",
+                  placeholder: "••••••••",
+                },
+              },
+            }}
+            onSubmit={changePassword}
+          >
+            <AutoFormSubmit disabled={loading}>Salvar</AutoFormSubmit>
+          </AutoForm>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
+    <Card className="w-[400px]">
+      <CardHeader>
+        <CardTitle>Recuperar senha</CardTitle>
+        <CardDescription>
+          Insira o email da sua conta para recuperar a senha.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <AutoForm formSchema={resetForm} onSubmit={sendResetEmail}>
+          <AutoFormSubmit disabled={loading}>
+            Enviar email de recuperação
+          </AutoFormSubmit>
+        </AutoForm>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ResetPasswordPage() {
+  return (
     <div className="flex items-center justify-center min-h-screen">
-      <Card className="w-[400px]">
-        <CardHeader>
-          <CardTitle>Recuperar senha</CardTitle>
-          <CardDescription>
-            Insira o email da sua conta para recuperar a senha.
-          </CardDescription>
-          <CardContent>
-            <AutoForm formSchema={resetForm} onSubmit={sendResetEmail}>
-              <AutoFormSubmit disabled={loading}>
-                Enviar email de recuperação
-              </AutoFormSubmit>
-            </AutoForm>
-          </CardContent>
-        </CardHeader>
-      </Card>
+      <Suspense fallback={<div>Carregando...</div>}>
+        <ResetPasswordContent />
+      </Suspense>
     </div>
   );
 }
 
-export default resetPasswordPage;
+export default ResetPasswordPage;

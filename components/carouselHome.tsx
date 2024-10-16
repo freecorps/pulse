@@ -70,7 +70,9 @@ export function CarouselHome() {
               current === index ? "bg-dot-active" : "bg-dot-inactive"
             }`}
             onClick={() => {
-              api && api.scrollTo(index);
+              if (api) {
+                api.scrollTo(index);
+              }
             }}
           ></button>
         ))}

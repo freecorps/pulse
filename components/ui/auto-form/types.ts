@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import {
   ControllerRenderProps,
   FieldValues,
@@ -56,7 +57,7 @@ export type ValueDependency<SchemaType extends z.infer<z.ZodObject<any, any>>> =
 export type EnumValues = readonly [string, ...string[]];
 
 export type OptionsDependency<
-  SchemaType extends z.infer<z.ZodObject<any, any>>,
+  SchemaType extends z.infer<z.ZodObject<any, any>>
 > = BaseDependency<SchemaType> & {
   type: DependencyType.SETS_OPTIONS;
 

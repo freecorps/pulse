@@ -137,7 +137,7 @@ export default function AuthPage() {
                   </Button>
                 </div>
                 <div className="text-sm">
-                  Ao clicar em "Login" você concorda com nossos{" "}
+                  Ao clicar em &ldquo;Login&ldquo; você concorda com nossos{" "}
                   <Link href="/terms" className="text-purple-500">
                     Termos de Serviço
                   </Link>{" "}
@@ -197,7 +197,7 @@ export default function AuthPage() {
                   </Button>
                 </div>
                 <div className="text-sm">
-                  Ao clicar em "Registrar" você concorda com nossos{" "}
+                  Ao clicar em &ldquo;Registrar&ldquo; você concorda com nossos{" "}
                   <Link href="/terms" className="text-purple-500">
                     Termos de Serviço
                   </Link>{" "}

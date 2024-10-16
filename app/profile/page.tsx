@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/app/stores/AuthStore";
 import { account, storage } from "@/app/appwrite";
-import { Models, OAuthProvider, ID } from "appwrite";
+import { Models, OAuthProvider } from "appwrite";
 import { toast } from "sonner";
 import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { useRouter } from "next/navigation";
@@ -118,7 +118,7 @@ export default function Profile() {
         await account.updatePhone(data.phone || "", data.password);
       }
       toast.success("Profile updated successfully!");
-    } catch (error) {
+    } catch {
       toast.error("Failed to update profile. Please try again.");
     }
   };
@@ -162,7 +162,6 @@ export default function Profile() {
 
   const isProviderLinked = (provider: OAuthProvider) => {
     return user.targets.some((identity) => identity.name === provider);
-    user
   };
 
   return (
