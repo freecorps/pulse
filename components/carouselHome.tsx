@@ -11,6 +11,13 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function CarouselHome() {
   const [api, setApi] = React.useState<CarouselApi>();
@@ -36,6 +43,7 @@ export function CarouselHome() {
 
   return (
     <div className="w-full max-w-5xl mx-auto">
+      <h1>Destaques e Recomendados</h1>
       <Carousel
         plugins={[plugin.current]}
         className="w-full"
@@ -60,8 +68,6 @@ export function CarouselHome() {
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>
-
-      {/* Retângulos indicadores */}
       <div className="flex justify-center space-x-2 py-2">
         {Array.from({ length: count }).map((_, index) => (
           <button
@@ -77,6 +83,16 @@ export function CarouselHome() {
           ></button>
         ))}
       </div>
+      <Select>
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Theme" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="light">Light</SelectItem>
+          <SelectItem value="dark">Dark</SelectItem>
+          <SelectItem value="system">System</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 }

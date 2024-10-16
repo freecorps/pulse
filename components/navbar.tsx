@@ -31,15 +31,17 @@ export default function Navbar() {
               <span className="sr-only">Pulse</span>
             </Link>
             <nav className="hidden lg:flex items-center gap-4">
-              {["Home", "News", "Forum", "Games", "Premium"].map((item) => (
-                <Link
-                  key={item}
-                  href={`/${item.toLowerCase()}`}
-                  prefetch={false}
-                >
-                  <Button variant="ghost">{item}</Button>
-                </Link>
-              ))}
+              {["Home", "Notícias", "Análises", "Fórum", "Jogos", "Times"].map(
+                (item) => (
+                  <Link
+                    key={item}
+                    href={`/${item.toLowerCase()}`}
+                    prefetch={false}
+                  >
+                    <Button variant="ghost">{item}</Button>
+                  </Link>
+                )
+              )}
             </nav>
           </div>
           <div className="flex items-center gap-4">
