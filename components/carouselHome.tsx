@@ -23,10 +23,10 @@ export function CarouselHome() {
     }
 
     setCount(api.scrollSnapList().length);
-    setCurrent(api.selectedScrollSnap() + 1);
+    setCurrent(api.selectedScrollSnap());
 
     api.on("select", () => {
-      setCurrent(api.selectedScrollSnap() + 1);
+      setCurrent(api.selectedScrollSnap());
     });
   }, [api]);
 
@@ -35,20 +35,20 @@ export function CarouselHome() {
   );
 
   return (
-    <div className="mx-auto max-w-xs">
+    <div className="w-full max-w-5xl mx-auto">
       <Carousel
         plugins={[plugin.current]}
-        className="w-full max-w-5xl"
+        className="w-full"
         onMouseEnter={plugin.current.stop}
         onMouseLeave={plugin.current.reset}
         opts={{ loop: true }}
         setApi={setApi}
       >
-        <CarouselContent className="space-x-4">
+        <CarouselContent className="space-x-4 px-4">
           {Array.from({ length: 5 }).map((_, index) => (
             <CarouselItem key={index} className="flex-shrink-0 w-full">
               <div className="p-2">
-                <Card className="w-full h-48 md:h-64 lg:h-80">
+                <Card className="w-full h-64 md:h-80 lg:h-96">
                   <CardContent className="flex items-center justify-center h-full p-8">
                     <span className="text-4xl font-semibold">{index + 1}</span>
                   </CardContent>
@@ -60,8 +60,20 @@ export function CarouselHome() {
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>
-      <div className="py-2 text-center text-sm text-muted-foreground">
-        Slide {current} of {count}
+
+      {/* Retângulos indicadores */}
+      <div className="flex justify-center space-x-2 py-2">
+        {Array.from({ length: count }).map((_, index) => (
+          <button
+            key={index}
+            className={`w-4 h-2 rounded ${
+              current === index ? "bg-dot-active" : "bg-dot-inactive"
+            }`}
+            onClick={() => {
+              api && api.scrollTo(index);
+            }}
+          ></button>
+        ))}
       </div>
     </div>
   );
