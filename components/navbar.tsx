@@ -15,7 +15,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Card } from "./ui/card";
 import { Models } from "appwrite";
 
 export default function Navbar() {
