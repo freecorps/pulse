@@ -19,7 +19,8 @@ function resetPasswordPage() {
   const userId = searchParams.get("userId");
   const [step, setStep] = useState<"reset" | "newPassword">("reset");
 
-  const { resetPassword, loading, updateUserPassword } = useAuthStore();
+  const { resetPassword, loading, updateUserPassword, removeUser } =
+    useAuthStore();
 
   useEffect(() => {
     if (secret && userId) {
@@ -56,7 +57,8 @@ function resetPasswordPage() {
     }
     try {
       await updateUserPassword(userId, secret, password);
-      toast.success("Senha alterada com sucesso");
+      removeUser();
+      toast.success("Senha alterada com sucesso, agora você pode fazer login.");
     } catch (error) {
       toast.error((error as Error).message);
     }

@@ -24,6 +24,7 @@ interface AuthState {
     secret: string,
     password: string
   ) => Promise<void>;
+  removeUser: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -134,6 +135,10 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           set({ error: (error as Error).message, loading: false });
         }
+      },
+
+      removeUser: () => {
+        set({ user: null });
       },
     }),
     {
