@@ -19,6 +19,11 @@ interface AuthState {
   ) => Promise<void>;
   getSession: () => Promise<Models.Session | undefined>;
   updateProfilePicture: (url: string) => Promise<void>;
+  updateUserPassword: (
+    userId: string,
+    secret: string,
+    password: string
+  ) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -88,6 +93,20 @@ export const useAuthStore = create<AuthState>()(
             email,
             "https://pulse.freecorps.xyz/reset-password"
           );
+          set({ loading: false });
+        } catch (error) {
+          set({ error: (error as Error).message, loading: false });
+        }
+      },
+
+      updateUserPassword: async (
+        userId: string,
+        secret: string,
+        password: string
+      ) => {
+        set({ loading: true, error: null });
+        try {
+          await account.updateRecovery(userId, secret, password);
           set({ loading: false });
         } catch (error) {
           set({ error: (error as Error).message, loading: false });
