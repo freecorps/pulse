@@ -22,15 +22,15 @@ export default function Navbar() {
   const { user, logout } = useAuthStore();
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-20 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="fixed top-0 left-0 right-0 h-12 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container h-full mx-auto px-4">
         <div className="flex items-center justify-between h-full">
-          <Link href="/" className="flex items-center" prefetch={false}>
-            <MountainIcon className="h-6 w-6" />
-            <span className="sr-only">Pulse</span>
-          </Link>
-          <nav className="hidden lg:flex items-center">
-            <Card className="flex items-center gap-1 p-1">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center" prefetch={false}>
+              <MountainIcon className="h-6 w-6" />
+              <span className="sr-only">Pulse</span>
+            </Link>
+            <nav className="hidden lg:flex items-center gap-4">
               {["Home", "News", "Forum", "Games", "Premium"].map((item) => (
                 <Link
                   key={item}
@@ -40,8 +40,8 @@ export default function Navbar() {
                   <Button variant="ghost">{item}</Button>
                 </Link>
               ))}
-            </Card>
-          </nav>
+            </nav>
+          </div>
           <div className="flex items-center gap-4">
             {user ? (
               <>
