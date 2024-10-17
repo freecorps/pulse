@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -8,6 +10,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { MultiSelect } from "@/components/multi-select";
 
 interface NewsItem {
   id: number;
@@ -23,8 +26,30 @@ interface NewsListProps {
 }
 
 export function NewsList({ newsItems }: NewsListProps) {
+  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>([]);
+
+  const frameworksList = [
+    { value: "react", label: "React" },
+    { value: "angular", label: "Angular" },
+    { value: "vue", label: "Vue" },
+    { value: "svelte", label: "Svelte" },
+    { value: "ember", label: "Ember" },
+  ];
+
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8 px-4 mt-16">
+    <div className="w-full max-w-4xl mx-auto space-y-8 px-4 mt-8">
+      <div className="flex justify-end mb-4">
+        <MultiSelect
+          options={frameworksList}
+          onValueChange={setSelectedFrameworks}
+          defaultValue={selectedFrameworks}
+          placeholder="Filtrar notícias"
+          variant="inverted"
+          animation={2}
+          maxCount={3}
+          className="w-auto"
+        />
+      </div>
       {newsItems.map((news, index) => (
         <div key={news.id}>
           <a>
