@@ -89,8 +89,8 @@ export default function AuthPage() {
                 formSchema={loginSchema}
                 fieldConfig={{
                   password: {
+                    fieldType: "password",
                     inputProps: {
-                      type: "password",
                       placeholder: "••••••••",
                     },
                   },
@@ -162,8 +162,8 @@ export default function AuthPage() {
               <AutoForm
                 fieldConfig={{
                   password: {
+                    fieldType: "password",
                     inputProps: {
-                      type: "password",
                       placeholder: "••••••••",
                     },
                   },
