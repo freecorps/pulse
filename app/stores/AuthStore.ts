@@ -18,7 +18,7 @@ interface AuthState {
     scopes?: string[]
   ) => Promise<void>;
   getSession: () => Promise<Models.Session | undefined>;
-  updateProfilePicture: (url: string) => Promise<void>;
+  updateProfilePicture: (url: string, oldID: string) => Promise<void>;
   updateUserPassword: (
     userId: string,
     secret: string,
@@ -114,10 +114,13 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      updateProfilePicture: async (url: string) => {
+      updateProfilePicture: async (url: string, oldID: string) => {
         set({ loading: true, error: null });
         try {
-          await account.updatePrefs({ profilePictureUrl: url });
+          await account.updatePrefs({
+            profilePictureUrl: url,
+            profilePictureId: oldID,
+          });
           const user = await account.get();
           set({ user });
           set({ loading: false });
