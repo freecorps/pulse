@@ -136,10 +136,6 @@ export default function Profile() {
     }
   };
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
   const addIdentity = async (provider: OAuthProvider) => {
     try {
       const location = window.location.href;
