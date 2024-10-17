@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/app/stores/AuthStore";
 import { account, storage } from "@/app/appwrite";
-import { Models, OAuthProvider } from "appwrite";
+import { Models, OAuthProvider, ID } from "appwrite";
 import { toast } from "sonner";
 import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { useRouter } from "next/navigation";
@@ -44,33 +44,46 @@ export default function Profile() {
     }
   }, [user]);
 
+  const uploadProfilePicture = async (file: File) => {
+    if (!user) {
+      return;
+    }
+
+    toast.promise(
+      (async () => {
+        const newFileId = ID.unique();
+        await storage.createFile("profilePicture", newFileId, file);
+        const fileUrl = storage.getFileView("profilePicture", newFileId);
+
+        if (user.prefs?.profilePictureId) {
+          try {
+            await storage.deleteFile(
+              "profilePicture",
+              user.prefs.profilePictureId
+            );
+          } catch (error) {
+            console.error("Error deleting old profile picture:", error);
+          }
+        }
+
+        await updateProfilePicture(fileUrl, newFileId);
+        setProfilePicture(fileUrl);
+        return fileUrl;
+      })(),
+      {
+        loading: "Uploading profile picture...",
+        success: `Profile picture updated successfully!`,
+        error: "Failed to update profile picture. Please try again.",
+      }
+    );
+  };
+
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       uploadProfilePicture(file);
     }
-  };
-
-  const uploadProfilePicture = async (file: File) => {
-    if (!user) {
-      return;
-    }
-    try {
-      const fileId = user.$id;
-      await storage.createFile("profilePicture", fileId, file);
-
-      const fileUrl = storage.getFileView("profilePicture", fileId);
-
-      await account.updatePrefs({ profilePictureUrl: fileUrl });
-
-      updateProfilePicture(fileUrl);
-
-      setProfilePicture(fileUrl);
-      toast.success("Profile picture updated successfully!");
-    } catch (error) {
-      console.error("Error uploading profile picture:", error);
-      toast.error("Failed to upload profile picture. Please try again.");
-    }
+    event.target.value = "";
   };
 
   if (!user) {
@@ -123,10 +136,6 @@ export default function Profile() {
     }
   };
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
   const addIdentity = async (provider: OAuthProvider) => {
     try {
       const location = window.location.href;
@@ -174,13 +183,15 @@ export default function Profile() {
               <CardTitle>Profile Picture</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-4">
-              <Image
-                src={profilePicture as string}
-                alt="Profile Picture"
-                width={100}
-                height={100}
-                className="rounded-full"
-              />
+              {profilePicture && (
+                <Image
+                  src={profilePicture}
+                  alt="Profile Picture"
+                  width={100}
+                  height={100}
+                  className="rounded-full"
+                />
+              )}
               <input
                 type="file"
                 accept="image/*"
@@ -188,7 +199,11 @@ export default function Profile() {
                 ref={fileInputRef}
                 className="hidden"
               />
-              <Button onClick={triggerFileInput}>Upload New Picture</Button>
+              <Button onClick={() => fileInputRef.current?.click()}>
+                {profilePicture
+                  ? "Update Profile Picture"
+                  : "Upload Profile Picture"}
+              </Button>
             </CardContent>
           </Card>
 

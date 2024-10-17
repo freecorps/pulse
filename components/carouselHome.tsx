@@ -11,13 +11,6 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export function CarouselHome() {
   const [api, setApi] = React.useState<CarouselApi>();
@@ -42,8 +35,7 @@ export function CarouselHome() {
   );
 
   return (
-    <div className="w-full max-w-5xl mx-auto">
-      <h1>Destaques e Recomendados</h1>
+    <div className="w-full max-w-5xl mx-auto mt-4">
       <Carousel
         plugins={[plugin.current]}
         className="w-full"
@@ -52,6 +44,7 @@ export function CarouselHome() {
         opts={{ loop: true }}
         setApi={setApi}
       >
+        <h1>Destaques e Recomendados</h1>
         <CarouselContent className="space-x-4 px-4">
           {Array.from({ length: 5 }).map((_, index) => (
             <CarouselItem key={index} className="flex-shrink-0 w-full">
@@ -83,16 +76,6 @@ export function CarouselHome() {
           ></button>
         ))}
       </div>
-      <Select>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Theme" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="light">Light</SelectItem>
-          <SelectItem value="dark">Dark</SelectItem>
-          <SelectItem value="system">System</SelectItem>
-        </SelectContent>
-      </Select>
     </div>
   );
 }
