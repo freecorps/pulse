@@ -18,6 +18,7 @@ interface AuthState {
     scopes?: string[]
   ) => Promise<void>;
   getSession: () => Promise<Models.Session | undefined>;
+  createSession: (userID: string, secret: string) => Promise<void>;
   updateProfilePicture: (url: string, oldID: string) => Promise<void>;
   updateUserPassword: (
     userId: string,
@@ -121,6 +122,18 @@ export const useAuthStore = create<AuthState>()(
             profilePictureUrl: url,
             profilePictureId: oldID,
           });
+          const user = await account.get();
+          set({ user });
+          set({ loading: false });
+        } catch (error) {
+          set({ error: (error as Error).message, loading: false });
+        }
+      },
+
+      createSession: async (userID: string, secret: string) => {
+        set({ loading: true, error: null });
+        try {
+          await account.createSession(userID, secret);
           const user = await account.get();
           set({ user });
           set({ loading: false });
