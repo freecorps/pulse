@@ -1,6 +1,7 @@
 import Navbar from "@/components/navbar";
 import { CarouselHome } from "@/components/carouselHome";
 import { NewsList } from "@/components/newsList";
+import Footer from "@/components/footer";
 
 interface NewsItem {
   id: number;
@@ -41,9 +42,7 @@ export default function Home() {
         <CarouselHome />
         <NewsList newsItems={newsItems} />
       </main>
-      <footer className="flex gap-6 flex-wrap items-center justify-center">
-        {/* Conteúdo do footer */}
-      </footer>
+      <Footer />
     </div>
   );
 }
