@@ -4,6 +4,7 @@ import AutoFormEnum from "./fields/enum";
 import AutoFormFile from "./fields/file";
 import AutoFormInput from "./fields/input";
 import AutoFormNumber from "./fields/number";
+import AutoFormPassword from "./fields/password";
 import AutoFormRadioGroup from "./fields/radio-group";
 import AutoFormSwitch from "./fields/switch";
 import AutoFormTextarea from "./fields/textarea";
@@ -17,6 +18,7 @@ export const INPUT_COMPONENTS = {
   textarea: AutoFormTextarea,
   number: AutoFormNumber,
   file: AutoFormFile,
+  password: AutoFormPassword,
   fallback: AutoFormInput,
 };
 

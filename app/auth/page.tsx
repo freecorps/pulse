@@ -31,13 +31,13 @@ export default function AuthPage() {
 
   const loginSchema = z.object({
     email: z.string().email(),
-    password: z.string().min(6),
+    password: z.string().describe("Senha").min(6),
   });
 
   const registerSchema = z.object({
     email: z.string().email(),
-    password: z.string().min(6),
-    name: z.string(),
+    password: z.string().describe("Senha").min(6),
+    name: z.string().describe("Nome"),
   });
 
   if (user) {
@@ -83,14 +83,14 @@ export default function AuthPage() {
               <CardTitle>Login</CardTitle>
               <CardDescription>Entre com seus dados de login.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent>
               <AutoForm
-                className="flex flex-col gap-1"
+                className="flex flex-col"
                 formSchema={loginSchema}
                 fieldConfig={{
                   password: {
+                    fieldType: "password",
                     inputProps: {
-                      type: "password",
                       placeholder: "••••••••",
                     },
                   },
@@ -103,14 +103,14 @@ export default function AuthPage() {
                   }
                 }}
               >
-                <AutoFormSubmit>Login</AutoFormSubmit>
-                <div>
+                <div className="flex">
                   <Link href="/reset-password">
-                    <Button variant="secondary" className="w-full">
+                    <Button variant="link" className="w-full p-0">
                       Esqueci minha senha
                     </Button>
                   </Link>
                 </div>
+                <AutoFormSubmit>Login</AutoFormSubmit>
                 <Separator>ou entre com</Separator>
                 <div className="flex gap-4 h-full justify-center mr-16 ml-16">
                   <Button
@@ -162,8 +162,8 @@ export default function AuthPage() {
               <AutoForm
                 fieldConfig={{
                   password: {
+                    fieldType: "password",
                     inputProps: {
-                      type: "password",
                       placeholder: "••••••••",
                     },
                   },
@@ -186,7 +186,7 @@ export default function AuthPage() {
                     onClick={() => {
                       loginWithOAuth(
                         OAuthProvider.Discord,
-                        window.location.href
+                        window.location.href + "auth/redirect"
                       );
                     }}
                   >
@@ -197,7 +197,7 @@ export default function AuthPage() {
                     onClick={() => {
                       loginWithOAuth(
                         OAuthProvider.Google,
-                        window.location.href
+                        window.location.href + "auth/redirect"
                       );
                     }}
                   >

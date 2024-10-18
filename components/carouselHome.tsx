@@ -35,7 +35,7 @@ export function CarouselHome() {
   );
 
   return (
-    <div className="w-full max-w-5xl mx-auto">
+    <div className="w-full max-w-5xl mx-auto mt-4">
       <Carousel
         plugins={[plugin.current]}
         className="w-full"
@@ -44,6 +44,7 @@ export function CarouselHome() {
         opts={{ loop: true }}
         setApi={setApi}
       >
+        <h1>Destaques e Recomendados</h1>
         <CarouselContent className="space-x-4 px-4">
           {Array.from({ length: 5 }).map((_, index) => (
             <CarouselItem key={index} className="flex-shrink-0 w-full">
@@ -60,8 +61,6 @@ export function CarouselHome() {
         <CarouselPrevious />
         <CarouselNext />
       </Carousel>
-
-      {/* Retângulos indicadores */}
       <div className="flex justify-center space-x-2 py-2">
         {Array.from({ length: count }).map((_, index) => (
           <button

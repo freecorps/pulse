@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Models } from "appwrite";
+import { siteLinks } from "@/config/site";
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
@@ -31,13 +32,9 @@ export default function Navbar() {
               <span className="sr-only">Pulse</span>
             </Link>
             <nav className="hidden lg:flex items-center gap-4">
-              {["Home", "News", "Forum", "Games", "Premium"].map((item) => (
-                <Link
-                  key={item}
-                  href={`/${item.toLowerCase()}`}
-                  prefetch={false}
-                >
-                  <Button variant="ghost">{item}</Button>
+              {siteLinks.map((item) => (
+                <Link key={item.name} href={item.href} prefetch={false}>
+                  <Button variant="ghost">{item.name}</Button>
                 </Link>
               ))}
             </nav>
@@ -70,14 +67,9 @@ export default function Navbar() {
               </SheetTrigger>
               <SheetContent side="right">
                 <nav className="flex flex-col gap-4">
-                  {["Home", "News", "Forum", "Games", "Premium"].map((item) => (
-                    <Link
-                      key={item}
-                      href={`/${item.toLowerCase()}`}
-                      className="text-lg font-semibold"
-                      prefetch={false}
-                    >
-                      {item}
+                  {siteLinks.map((item) => (
+                    <Link key={item.name} href={item.href} prefetch={false}>
+                      <Button variant="ghost">{item.name}</Button>
                     </Link>
                   ))}
                   {!user && (
