@@ -24,7 +24,7 @@ function RedirectSession() {
     } else {
       router.push("/auth");
     }
-  }, [secret, userId]);
+  }, [secret, userId, createSession, router]);
 
   if (user) {
     router.push("/");

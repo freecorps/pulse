@@ -62,8 +62,8 @@ const TermsOfService = () => {
                     propriedade dos materiais; ou{" "}
                   </li>
                   <li>
-                    transferir os materiais para outra pessoa ou 'espelhe' os
-                    materiais em qualquer outro servidor.
+                    transferir os materiais para outra pessoa ou
+                    &apos;espelhe&apos; os materiais em qualquer outro servidor.
                   </li>
                 </ol>
                 <p className="mt-2">
@@ -82,13 +82,13 @@ const TermsOfService = () => {
                 </h2>
                 <ol className="list-decimal pl-5 space-y-2">
                   <li>
-                    Os materiais no site da Pulse são fornecidos 'como estão'.
-                    Pulse não oferece garantias, expressas ou implícitas, e, por
-                    este meio, isenta e nega todas as outras garantias,
-                    incluindo, sem limitação, garantias implícitas ou condições
-                    de comercialização, adequação a um fim específico ou não
-                    violação de propriedade intelectual ou outra violação de
-                    direitos.
+                    Os materiais no site da Pulse são fornecidos &apos;como
+                    estão&apos;. Pulse não oferece garantias, expressas ou
+                    implícitas, e, por este meio, isenta e nega todas as outras
+                    garantias, incluindo, sem limitação, garantias implícitas ou
+                    condições de comercialização, adequação a um fim específico
+                    ou não violação de propriedade intelectual ou outra violação
+                    de direitos.
                   </li>
                   <li>
                     Além disso, o Pulse não garante ou faz qualquer

@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     });
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     return new Response(JSON.stringify({ error: (error as Error).message }), {
       status: 500,
     });
