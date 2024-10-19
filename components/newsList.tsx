@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { MultiSelect } from "@/components/multi-select";
-import { Posts, Games } from "@/types/appwrite";
+import { Posts } from "@/types/appwrite";
 
 interface NewsListProps {
   newsItems: Posts[];
@@ -57,9 +57,7 @@ export function NewsList({
                 </CardContent>
                 <CardFooter className="flex justify-between">
                   <span className="text-sm text-muted-foreground">
-                    {news.games
-                      ?.map((game: Games) => game.abreviation || game.name)
-                      .join(", ")}
+                    {news.games?.name}
                   </span>
                   <span className="text-sm text-muted-foreground">
                     {new Date(news.$createdAt).toLocaleDateString()}
