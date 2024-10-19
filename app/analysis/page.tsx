@@ -8,9 +8,9 @@ import { useEffect, useState } from "react";
 import { Posts } from "@/types/appwrite";
 import { Query } from "appwrite";
 import { Skeleton } from "@/components/ui/skeleton";
-import { databases } from "./appwrite";
+import { databases } from "../appwrite";
 
-export default function Home() {
+export default function AnalysisPage() {
   const [posts, setPosts] = useState<Posts[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -20,6 +20,7 @@ export default function Home() {
       try {
         const response = await databases.listDocuments("news", "posts", [
           Query.orderDesc("$createdAt"),
+          Query.equal("type", "analysis"),
         ]);
         setPosts(response.documents as Posts[]);
       } catch (error) {
