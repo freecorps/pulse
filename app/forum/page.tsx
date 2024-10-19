@@ -20,10 +20,10 @@ export default function Forum() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="p-8">
-        <div className="mb-1">
-          <Forumeffect />
+      <div className="flex flex-col p-8">
+        <div className="flex flex-col mb-1">
         <div className="flex flex-col items-center">
+        <Forumeffect />
           <div className=" bg-muted rounded-lg p-4 size-10/12 items-center">
             {items.map(item => (
               <a 
