@@ -58,7 +58,7 @@ export default function AuthPage() {
               Fazer Logout
             </Button>
             <Button variant="secondary">
-              <Link href={"./dashboard"}>Ir para a Dashboard</Link>
+              <Link href={"/"}>Ir para a Home</Link>
             </Button>
           </CardContent>
         </Card>
@@ -115,10 +115,10 @@ export default function AuthPage() {
                 <div className="flex gap-4 h-full justify-center mr-16 ml-16">
                   <Button
                     className="flex-grow"
-                    onClick={() => {
-                      loginWithOAuth(
+                    onClick={async () => {
+                      await loginWithOAuth(
                         OAuthProvider.Discord,
-                        window.location.href
+                        window.location.origin + "/auth/redirect"
                       );
                     }}
                   >
@@ -126,10 +126,10 @@ export default function AuthPage() {
                   </Button>
                   <Button
                     className="flex-grow"
-                    onClick={() => {
-                      loginWithOAuth(
+                    onClick={async () => {
+                      await loginWithOAuth(
                         OAuthProvider.Google,
-                        window.location.href
+                        window.location.origin + "/auth/redirect"
                       );
                     }}
                   >
@@ -183,10 +183,10 @@ export default function AuthPage() {
                 <div className="flex gap-4 h-full justify-center mr-16 ml-16">
                   <Button
                     className="flex-grow"
-                    onClick={() => {
-                      loginWithOAuth(
+                    onClick={async () => {
+                      await loginWithOAuth(
                         OAuthProvider.Discord,
-                        window.location.href + "auth/redirect"
+                        window.location.origin + "/auth/redirect"
                       );
                     }}
                   >
@@ -194,10 +194,10 @@ export default function AuthPage() {
                   </Button>
                   <Button
                     className="flex-grow"
-                    onClick={() => {
-                      loginWithOAuth(
+                    onClick={async () => {
+                      await loginWithOAuth(
                         OAuthProvider.Google,
-                        window.location.href + "auth/redirect"
+                        window.location.origin + "/auth/redirect"
                       );
                     }}
                   >

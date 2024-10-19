@@ -18,4 +18,5 @@ export interface Editor extends Models.Document {
 export interface Games extends Models.Document {
     name: string;
     imageURL: string;
+    abreviation?: string;
 };

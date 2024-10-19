@@ -65,7 +65,7 @@ export const useAuthStore = create<AuthState>()(
       ) => {
         set({ loading: true, error: null });
         try {
-          await account.createOAuth2Session(
+          await account.createOAuth2Token(
             provider,
             onSuccess,
             onFailure,
