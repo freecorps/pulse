@@ -9,7 +9,7 @@ export const siteLinks = [
   },
   {
     name: "Análises",
-    href: "/reviews",
+    href: "/analysis",
   },
   {
     name: "Fórum",

@@ -1,54 +1,47 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import { CarouselHome } from "@/components/carouselHome";
 import { NewsList } from "@/components/newsList";
 import Footer from "@/components/footer";
-import { Posts, Games } from "@/types/appwrite";
+import { useEffect, useState } from "react";
+import { Posts } from "@/types/appwrite";
 import { Query } from "appwrite";
 import { Skeleton } from "@/components/ui/skeleton";
-import { databases } from "./appwrite";
+import { databases } from "../appwrite";
 
-export default function Home() {
+export default function AnalysisPage() {
   const [posts, setPosts] = useState<Posts[]>([]);
-  const [games, setGames] = useState<Games[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchNews() {
       try {
-        // Fetch games
-        const gamesResponse = await databases.listDocuments("news", "games");
-        setGames(gamesResponse.documents as Games[]);
-
-        // Fetch posts
-        const postsResponse = await databases.listDocuments("news", "posts", [
+        const response = await databases.listDocuments("news", "posts", [
           Query.orderDesc("$createdAt"),
+          Query.equal("type", "analysis"),
         ]);
-        setPosts(postsResponse.documents as Posts[]);
+        setPosts(response.documents as Posts[]);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching news:", error);
       } finally {
         setLoading(false);
       }
     }
-    fetchData();
+    fetchNews();
   }, []);
 
-  const typesList = games.map((game) => ({
-    value: game.name,
-    label: game.abreviation || game.name,
-  }));
+  const typesList = Array.from(new Set(posts.map((post) => post.type))).map(
+    (type) => ({
+      value: type,
+      label: type,
+    })
+  );
 
   const filteredPosts =
     selectedTypes.length > 0
-      ? posts.filter((post) => {
-          const gameNames =
-            post.games?.map((game: { name: any }) => game.name) || [];
-          return selectedTypes.some((type) => gameNames.includes(type));
-        })
+      ? posts.filter((post) => selectedTypes.includes(post.type))
       : posts;
 
   return (
