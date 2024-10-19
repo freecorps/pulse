@@ -14,7 +14,7 @@ export default function Home() {
   const [posts, setPosts] = useState<Posts[]>([]);
   const [games, setGames] = useState<Games[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedGameIds, setSelectedGameIds] = useState<string[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -23,11 +23,8 @@ export default function Home() {
         const gamesResponse = await databases.listDocuments("news", "games");
         setGames(gamesResponse.documents as Games[]);
 
-        // Fetch posts
-        const postsResponse = await databases.listDocuments("news", "posts", [
-          Query.orderDesc("$createdAt"),
-        ]);
-        setPosts(postsResponse.documents as Posts[]);
+        // Initially fetch all posts
+        await fetchPosts();
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -37,19 +34,48 @@ export default function Home() {
     fetchData();
   }, []);
 
-  const typesList = games.map((game) => ({
-    value: game.name,
-    label: game.abreviation || game.name,
-  }));
+  useEffect(() => {
+    fetchPosts();
+  }, [selectedGameIds]);
 
-  const filteredPosts =
-    selectedTypes.length > 0
-      ? posts.filter((post) => {
-          const gameNames =
-            post.games?.map((game: { name: any }) => game.name) || [];
-          return selectedTypes.some((type) => gameNames.includes(type));
-        })
-      : posts;
+  async function fetchPosts() {
+    try {
+      let postsQuery = [Query.orderDesc("$createdAt")];
+
+      if (selectedGameIds.length > 0) {
+        // Fetch posts for selected games
+        const selectedGames = await databases.listDocuments("news", "games", [
+          Query.equal("$id", selectedGameIds),
+        ]);
+
+        const postIds = selectedGames.documents.flatMap((document) => {
+          const game = document as Games;
+          return game.posts?.map((post: Posts) => post.$id) || [];
+        });
+
+        if (postIds.length > 0) {
+          postsQuery.push(Query.equal("$id", postIds));
+        } else {
+          setPosts([]);
+          return;
+        }
+      }
+
+      const postsResponse = await databases.listDocuments(
+        "news",
+        "posts",
+        postsQuery
+      );
+      setPosts(postsResponse.documents as Posts[]);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  }
+
+  const typesList = games.map((game) => ({
+    value: game.$id,
+    label: game.abbreviation || game.name,
+  }));
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -64,10 +90,10 @@ export default function Home() {
           </div>
         ) : (
           <NewsList
-            newsItems={filteredPosts}
+            newsItems={posts}
             typesList={typesList}
-            selectedTypes={selectedTypes}
-            setSelectedTypes={setSelectedTypes}
+            selectedTypes={selectedGameIds}
+            setSelectedTypes={setSelectedGameIds}
           />
         )}
       </main>

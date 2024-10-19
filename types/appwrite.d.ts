@@ -5,18 +5,20 @@ export interface Posts extends Models.Document {
     imageURL: string;
     type: string;
     description: string;
-    editor?: Editor;
     games?: Games;
+    editors?: Editors;
 };
 
-export interface Editor extends Models.Document {
+export interface Editors extends Models.Document {
     name: string;
     imageURL?: string;
     description?: string;
+    posts?: Posts;
 };
 
 export interface Games extends Models.Document {
     name: string;
     imageURL: string;
-    abreviation?: string;
+    abbreviation?: string;
+    posts?: Posts;
 };
