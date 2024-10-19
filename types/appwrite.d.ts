@@ -21,4 +21,5 @@ export interface Games extends Models.Document {
     imageURL: string;
     abbreviation?: string;
     posts?: Posts;
+    IamgeURLUpper?: string;
 };
