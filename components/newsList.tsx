@@ -40,7 +40,7 @@ export function NewsList({
       {newsItems.map((news, index) => (
         <div key={news.$id}>
           <a>
-            <Card className="flex flex-row md:flex-row cursor-pointer hover:shadow-md transition-shadow">
+            <Card className="flex flex-row md:flex-row cursor-pointer hover:shadow-md transition-shadow overflow-hidden">
               <img
                 src={news.imageURL}
                 alt={news.title}
