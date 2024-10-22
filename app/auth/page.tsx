@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-import { OAuthProvider } from "appwrite";
+import React, { useEffect, useState } from "react";
+import { AuthenticationFactor, Models, OAuthProvider } from "appwrite";
 import { useAuthStore } from "../stores/AuthStore";
 import { z } from "zod";
 import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FaDiscord, FaGoogle } from "react-icons/fa";
+import MFAChallenge from "@/components/mfaChallenge";
 
 const Separator: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="flex items-center my-4">
@@ -26,8 +27,31 @@ const Separator: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 export default function AuthPage() {
-  const { login, register, loading, user, loginWithOAuth, logout } =
-    useAuthStore();
+  const {
+    login,
+    register,
+    loading,
+    user,
+    loginWithOAuth,
+    logout,
+    isMFAChallengeRequired,
+    listMfaFactors,
+    verifyChallenge,
+  } = useAuthStore();
+
+  const [mfaFactors, setMfaFactors] = useState<Models.MfaFactors | null>(null);
+
+  useEffect(() => {
+    if (isMFAChallengeRequired) {
+      listMfaFactors().then((factors) => {
+        if (Object.keys(factors).length > 0) {
+          setMfaFactors(factors as Models.MfaFactors);
+        } else {
+          toast.error("Nenhum fator MFA disponível para esta conta.");
+        }
+      });
+    }
+  }, [isMFAChallengeRequired, listMfaFactors]);
 
   const loginSchema = z.object({
     email: z.string().email(),
@@ -68,6 +92,24 @@ export default function AuthPage() {
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (isMFAChallengeRequired && mfaFactors) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <MFAChallenge
+          factors={mfaFactors}
+          onVerify={async (factor, token) => {
+            try {
+              await verifyChallenge(factor, token);
+              toast.success("Verificação MFA bem-sucedida!");
+            } catch (error) {
+              toast.error("Falha na verificação MFA: " + String(error));
+            }
+          }}
+        />
+      </div>
+    );
   }
 
   return (

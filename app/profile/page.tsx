@@ -5,35 +5,69 @@ import Navbar from "@/components/navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/app/stores/AuthStore";
-import { account, storage } from "@/app/appwrite";
-import { Models, OAuthProvider, ID } from "appwrite";
+import { account, avatars, storage } from "@/app/appwrite";
+import { Models, OAuthProvider, ID, AuthenticationFactor } from "appwrite";
 import { toast } from "sonner";
 import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Credenza,
+  CredenzaContent,
+  CredenzaDescription,
+  CredenzaHeader,
+  CredenzaTitle,
+} from "@/components/ui/credenza/credenza";
 
 const profileSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
+  name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
+  email: z.string().email("Email inválido"),
   phone: z
     .string()
-    .startsWith("+", "Phone number must start with '+'")
-    .min(1, "Phone number is too short")
-    .max(15, "Phone number is too long")
+    .startsWith("+", "O número de telefone deve começar com +")
+    .min(1, "Número de telefone inválido")
+    .max(15, "Número de telefone inválido")
     .optional(),
   password: z
     .string()
-    .min(8, "Password must be at least 8 characters")
+    .min(8, "A senha deve ter pelo menos 8 caracteres")
     .optional(),
 });
 
 export default function Profile() {
-  const { user, logout, updateProfilePicture } = useAuthStore();
+  const {
+    user,
+    logout,
+    updateProfilePicture,
+    createMfaRecoveryCodes,
+    createTotp,
+    verifyAuthenticator,
+    updateMFA,
+  } = useAuthStore();
   const [sessions, setSessions] = useState<Models.Session[]>([]);
   const [mfaEnabled, setMfaEnabled] = useState(false);
+  const [mfaFactors, setMfaFactors] = useState<Models.MfaFactors | null>(null);
   const [profilePicture, setProfilePicture] = useState<string | undefined>();
+  const [isMfaDialogOpen, setIsMfaDialogOpen] = useState(false);
+  const [mfaStep, setMfaStep] = useState<
+    "confirm" | "recoveryCodes" | "setupMethod" | "verifyMethod"
+  >("confirm");
+  const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
+  const [totpSecret, setTotpSecret] = useState<string>("");
+  const [totpUri, setTotpUri] = useState<string>("");
+  const [verificationCode, setVerificationCode] = useState<string>("");
+  const [challengeID, setChallengeID] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    if (user) {
+      fetchSessions();
+      checkMfaStatus();
+      setProfilePicture(user.prefs?.profilePictureUrl);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (user) {
@@ -62,7 +96,7 @@ export default function Profile() {
               user.prefs.profilePictureId
             );
           } catch (error) {
-            console.error("Error deleting old profile picture:", error);
+            console.error("Erro ao deletar a foto de perfil antiga:", error);
           }
         }
 
@@ -71,9 +105,10 @@ export default function Profile() {
         return fileUrl;
       })(),
       {
-        loading: "Uploading profile picture...",
-        success: `Profile picture updated successfully!`,
-        error: "Failed to update profile picture. Please try again.",
+        loading: "Enviando foto de perfil...",
+        success: `Foto de perfil atualizada com sucesso!`,
+        error:
+          "Falha ao atualizar a foto de perfil. Por favor, tente novamente.",
       }
     );
   };
@@ -90,9 +125,13 @@ export default function Profile() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card>
-          <CardHeader>You need to be logged in to view this page.</CardHeader>
+          <CardHeader>
+            Você precisa estar logado para ver esta página.
+          </CardHeader>
           <CardContent>
-            <Button onClick={() => router.push("/auth")}>Go to Auth</Button>
+            <Button onClick={() => router.push("/auth")}>
+              Ir para Autenticação
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -104,18 +143,19 @@ export default function Profile() {
       const response = await account.listSessions();
       setSessions(response.sessions);
     } catch (error) {
-      console.error("Error fetching sessions:", error);
-      toast.error("Failed to fetch sessions");
+      console.error("Erro ao buscar sessões:", error);
+      toast.error("Falha ao buscar sessões");
     }
   };
 
   const checkMfaStatus = async () => {
     try {
       const factors = await account.listMfaFactors();
-      setMfaEnabled(factors.totp);
+      setMfaEnabled(factors.totp || factors.email);
+      setMfaFactors(factors);
     } catch (error) {
-      console.error("Error checking MFA status:", error);
-      toast.error("Failed to check MFA status");
+      console.error("Erro ao verificar o status da MFA:", error);
+      toast.error("Falha ao verificar o status da MFA");
     }
   };
 
@@ -130,47 +170,116 @@ export default function Profile() {
       if (data.phone !== user?.phone && data.password) {
         await account.updatePhone(data.phone || "", data.password);
       }
-      toast.success("Profile updated successfully!");
+      toast.success("Perfil atualizado com sucesso!");
     } catch {
-      toast.error("Failed to update profile. Please try again.");
+      toast.error("Falha ao atualizar o perfil. Por favor, tente novamente.");
     }
   };
 
-  const addIdentity = async (provider: OAuthProvider) => {
+  const startMfaSetup = async () => {
+    if (!user?.emailVerification) {
+      toast.error("Você precisa verificar seu email antes de habilitar a MFA.");
+      return;
+    }
+    setIsMfaDialogOpen(true);
+    setMfaStep("confirm");
+  };
+
+  const confirmMfaSetup = async () => {
     try {
-      const location = window.location.href;
-      await account.createOAuth2Session(provider, location);
-      toast.success(`${provider} account linked successfully!`);
+      if (!mfaFactors?.recoveryCode) {
+        const codes = await createMfaRecoveryCodes();
+        setRecoveryCodes(codes);
+        setMfaStep("recoveryCodes");
+      } else {
+        setMfaStep("setupMethod");
+      }
     } catch (error) {
-      console.error("Error adding identity:", error);
-      toast.error(`Failed to link ${provider} account. Please try again.`);
+      console.error("Erro ao criar códigos de recuperação:", error);
+      toast.error(
+        "Falha ao criar códigos de recuperação. Por favor, tente novamente."
+      );
     }
   };
 
-  const enableMfa = async () => {
-    return;
-    // try {
-    //   const factor = await account.createMfaAuthenticator();
-    //   // Here you would typically show a QR code to the user
-    //   toast.info("Scan the QR code with your authenticator app", {
-    //     duration: 10000,
-    //     description: `QR Code: ${factor.qrCode}`,
-    //   });
-    //   // After the user scans the QR code, they need to enter the code to complete setup
-    //   const code = prompt("Enter the code from your authenticator app:");
-    //   if (code) {
-    //     await account.updateMfaAuthenticator(factor.id, code);
-    //     setMfaEnabled(true);
-    //     toast.success("MFA enabled successfully!");
-    //   }
-    // } catch (error) {
-    //   console.error("Error enabling MFA:", error);
-    //   toast.error("Failed to enable MFA. Please try again.");
-    // }
+  const setupTOTP = async () => {
+    try {
+      const otpCreated = await createTotp();
+      if (!otpCreated) {
+        toast.error("Falha ao criar TOTP. Por favor, tente novamente.");
+        return;
+      }
+      setTotpSecret(otpCreated.secret);
+      setTotpUri(otpCreated.uri);
+      const qrCode = avatars.getQR(otpCreated.uri, 800, 0, false);
+      setTotpUri(qrCode);
+      setMfaStep("verifyMethod");
+    } catch (error) {
+      console.error("Erro ao configurar TOTP:", error);
+      toast.error("Falha ao configurar TOTP. Por favor, tente novamente.");
+    }
   };
 
-  const isProviderLinked = (provider: OAuthProvider) => {
-    return user.targets.some((identity) => identity.name === provider);
+  const verifyTOTP = async () => {
+    try {
+      await verifyAuthenticator(verificationCode);
+      await updateMFA(true);
+      toast.success("MFA habilitada com sucesso!");
+      setIsMfaDialogOpen(false);
+      checkMfaStatus();
+    } catch (error) {
+      console.error("Erro ao verificar TOTP:", error);
+      toast.error("Falha ao verificar TOTP. Por favor, tente novamente.");
+    }
+  };
+
+  const setupEmailMFA = async () => {
+    try {
+      const challengge = await account.createMfaChallenge(
+        AuthenticationFactor.Email
+      );
+      setChallengeID(challengge.$id);
+      setMfaStep("verifyMethod");
+    } catch (error) {
+      console.error("Erro ao configurar MFA por Email:", error);
+      toast.error(
+        "Falha ao configurar MFA por Email. Por favor, tente novamente."
+      );
+    }
+  };
+
+  const setupBackupCodes = async () => {
+    try {
+      const codes = await createMfaRecoveryCodes();
+      setRecoveryCodes(codes);
+      setMfaStep("recoveryCodes");
+    } catch (error) {
+      console.error("Erro ao configurar códigos de recuperação:", error);
+      toast.error(
+        "Falha ao configurar códigos de recuperação. Por favor, tente novamente."
+      );
+    }
+  };
+
+  const verifyEmailMFA = async () => {
+    if (!challengeID) {
+      toast.error(
+        "Erro ao verificar MFA por Email. Por favor, tente novamente."
+      );
+      return;
+    }
+    try {
+      await account.updateMfaChallenge(challengeID, verificationCode);
+      await updateMFA(true);
+      toast.success("MFA habilitada com sucesso!");
+      setIsMfaDialogOpen(false);
+      checkMfaStatus();
+    } catch (error) {
+      console.error("Erro ao verificar MFA por Email:", error);
+      toast.error(
+        "Falha ao verificar MFA por Email. Por favor, tente novamente."
+      );
+    }
   };
 
   return (
@@ -180,7 +289,7 @@ export default function Profile() {
         <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full max-w-3xl">
           <Card className="w-full">
             <CardHeader>
-              <CardTitle>Profile Picture</CardTitle>
+              <CardTitle>Foto de Perfil</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-4">
               {profilePicture && (
@@ -201,8 +310,8 @@ export default function Profile() {
               />
               <Button onClick={() => fileInputRef.current?.click()}>
                 {profilePicture
-                  ? "Update Profile Picture"
-                  : "Upload Profile Picture"}
+                  ? "Atualizar Foto de Perfil"
+                  : "Enviar Foto de Perfil"}
               </Button>
             </CardContent>
           </Card>
@@ -227,43 +336,23 @@ export default function Profile() {
                       placeholder: "••••••••",
                     },
                     description:
-                      "Type your current password to update email or phone number",
+                      "Digite sua senha atual para atualizar o email ou número de telefone",
                   },
                   phone: {
                     inputProps: {
-                      placeholder: "+1 (555) 123-4567",
+                      placeholder: "+55 (11) 91234-5678",
                     },
                   },
                 }}
               >
-                <AutoFormSubmit>Update Profile</AutoFormSubmit>
+                <AutoFormSubmit>Atualizar Perfil</AutoFormSubmit>
               </AutoForm>
             </CardContent>
           </Card>
 
           <Card className="w-full">
             <CardHeader>
-              <CardTitle>Linked Accounts</CardTitle>
-            </CardHeader>
-            <CardContent className="flex items-center gap-4">
-              <Button
-                onClick={() => addIdentity(OAuthProvider.Discord)}
-                disabled={isProviderLinked(OAuthProvider.Discord)}
-              >
-                Link Discord
-              </Button>
-              <Button
-                onClick={() => addIdentity(OAuthProvider.Google)}
-                disabled={isProviderLinked(OAuthProvider.Google)}
-              >
-                Link Google
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>Active Sessions</CardTitle>
+              <CardTitle>Sessões Ativas</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="list-disc pl-5">
@@ -279,16 +368,122 @@ export default function Profile() {
 
           <Card className="w-full">
             <CardHeader>
-              <CardTitle>Two-Factor Authentication</CardTitle>
+              <CardTitle>Autenticação de Dois Fatores</CardTitle>
             </CardHeader>
             <CardContent>
               {mfaEnabled ? (
-                <p>MFA is enabled for your account.</p>
+                <div>
+                  <p>A MFA está habilitada para sua conta.</p>
+                  {!mfaFactors?.totp && (
+                    <Button
+                      onClick={() => {
+                        setMfaStep("setupMethod");
+                        setIsMfaDialogOpen(true);
+                      }}
+                    >
+                      Habilitar TOTP
+                    </Button>
+                  )}
+                  {!mfaFactors?.email && (
+                    <Button onClick={setupEmailMFA}>
+                      Habilitar MFA por Email
+                    </Button>
+                  )}
+                  {!mfaFactors?.recoveryCode && (
+                    <Button onClick={setupBackupCodes}>
+                      Habilitar Códigos de Recuperação
+                    </Button>
+                  )}
+                </div>
               ) : (
-                <Button onClick={enableMfa}>Enable MFA</Button>
+                <Button onClick={startMfaSetup}>Habilitar MFA</Button>
               )}
             </CardContent>
           </Card>
+
+          <Credenza open={isMfaDialogOpen} onOpenChange={setIsMfaDialogOpen}>
+            <CredenzaContent>
+              <CredenzaHeader>
+                <CredenzaTitle>
+                  Habilitar Autenticação de Dois Fatores
+                </CredenzaTitle>
+                <CredenzaDescription>
+                  {mfaStep === "confirm" &&
+                    "Você tem certeza de que deseja habilitar a MFA?"}
+                  {mfaStep === "recoveryCodes" &&
+                    "Por favor, salve esses códigos de recuperação em um lugar seguro.\n Eles não poderam ser mostrados novamente."}
+                  {mfaStep === "setupMethod" &&
+                    "Escolha seu método MFA preferido."}
+                  {mfaStep === "verifyMethod" && "Verifique seu método MFA."}
+                </CredenzaDescription>
+              </CredenzaHeader>
+
+              {mfaStep === "confirm" && (
+                <Button onClick={confirmMfaSetup}>Sim, habilitar MFA</Button>
+              )}
+
+              {mfaStep === "recoveryCodes" && (
+                <>
+                  <div className="p-4 rounded bg-gray-100 shadow-md border border-gray-300">
+                    <h3 className="text-lg font-semibold mb-2">
+                      Códigos de Recuperação
+                    </h3>
+                    {recoveryCodes.map((code, index) => (
+                      <p
+                        key={index}
+                        className="font-mono text-sm bg-white p-2 rounded mb-1 shadow-sm"
+                      >
+                        {code}
+                      </p>
+                    ))}
+                  </div>
+                  <Button onClick={() => setMfaStep("setupMethod")}>
+                    Próximo
+                  </Button>
+                </>
+              )}
+
+              {mfaStep === "setupMethod" && (
+                <Tabs defaultValue="totp">
+                  <TabsList>
+                    <TabsTrigger value="totp">TOTP</TabsTrigger>
+                    <TabsTrigger value="email">Email</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="totp">
+                    <Button onClick={setupTOTP}>Configurar TOTP</Button>
+                  </TabsContent>
+                  <TabsContent value="email">
+                    <Button onClick={setupEmailMFA}>
+                      Configurar MFA por Email
+                    </Button>
+                  </TabsContent>
+                </Tabs>
+              )}
+
+              {mfaStep === "verifyMethod" && (
+                <>
+                  {totpUri && (
+                    <Image
+                      src={totpUri}
+                      alt="TOTP QR Code"
+                      width={200}
+                      height={200}
+                    />
+                  )}
+                  <input
+                    type="text"
+                    placeholder="Digite o código de verificação"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    className="border p-2 rounded"
+                  />
+                  <Button onClick={totpUri ? verifyTOTP : verifyEmailMFA}>
+                    Verificar
+                  </Button>
+                </>
+              )}
+            </CredenzaContent>
+          </Credenza>
         </main>
         <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
           <Button variant="destructive" onClick={logout}>
