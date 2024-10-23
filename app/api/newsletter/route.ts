@@ -1,15 +1,14 @@
 import { Resend } from "resend";
 
-// Em ambiente de build, não precisamos inicializar o Resend
-const resend =
-  process.env.NODE_ENV === "production"
-    ? new Resend(process.env.RESEND_API_KEY)
-    : null;
+const apiKey = process.env.RESEND_API_KEY;
+const resend = apiKey ? new Resend(apiKey) : null;
 
 export async function POST(request: Request) {
-  // Durante o build, não precisamos validar a chave
-  if (process.env.NODE_ENV !== "production") {
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
+  if (!resend) {
+    return new Response(
+      JSON.stringify({ error: "Newsletter service is not configured" }),
+      { status: 503 }
+    );
   }
 
   try {
@@ -21,7 +20,7 @@ export async function POST(request: Request) {
       });
     }
 
-    await resend?.contacts.create({
+    await resend.contacts.create({
       email: email,
       unsubscribed: false,
       audienceId: "aa185055-7560-419c-bcfc-a8b59b08aecd",
