@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { AuthenticationFactor, Models } from "appwrite";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,7 @@ import { useAuthStore } from "@/app/stores/AuthStore";
 const MFAChallenge: React.FC<{
   factors: Models.MfaFactors;
   onVerify: (factor: AuthenticationFactor, token: string) => Promise<void>;
-}> = ({ factors, onVerify }) => {
+}> = ({ factors }) => {
   const {
     mfaStep,
     selectedMfaFactor,

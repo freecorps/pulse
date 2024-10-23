@@ -64,7 +64,7 @@ export function CarouselHome() {
       >
         <h1 className="text-2xl font-bold mb-4">Destaques e Recomendados</h1>
         <CarouselContent className="space-x-4 px-4">
-          {featuredPosts.map((post, index) => (
+          {featuredPosts.map((post) => (
             <CarouselItem key={post.$id} className="flex-shrink-0 w-full">
               <div className="p-2">
                 <Card className="w-full h-64 md:h-80 lg:h-96 overflow-hidden">

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { AuthenticationFactor, Models, OAuthProvider } from "appwrite";
+import { Models, OAuthProvider } from "appwrite";
 import { useAuthStore } from "../stores/AuthStore";
 import { z } from "zod";
 import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";

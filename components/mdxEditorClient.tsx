@@ -25,7 +25,6 @@ import {
   thematicBreakPlugin,
   markdownShortcutPlugin,
 } from "@mdxeditor/editor";
-import { Separator } from "@radix-ui/react-select";
 
 const MDXEditorClient = forwardRef<
   MDXEditorMethods,
@@ -35,6 +34,7 @@ const MDXEditorClient = forwardRef<
     <MDXEditor
       {...props}
       ref={ref}
+      className={className}
       plugins={[
         headingsPlugin(),
         listsPlugin(),

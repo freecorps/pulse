@@ -6,6 +6,11 @@ const DynamicMDXEditor = dynamic(() => import("./mdxEditorClient"), {
   ssr: false,
 });
 
-export default React.forwardRef<MDXEditorMethods, MDXEditorProps>(
-  (props, ref) => <DynamicMDXEditor {...props} ref={ref} />
-);
+const ForwardedDynamicMDXEditor = React.forwardRef<
+  MDXEditorMethods,
+  MDXEditorProps
+>((props, ref) => <DynamicMDXEditor {...props} ref={ref} />);
+
+ForwardedDynamicMDXEditor.displayName = "ForwardedDynamicMDXEditor";
+
+export default ForwardedDynamicMDXEditor;

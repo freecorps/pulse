@@ -7,7 +7,7 @@ import { databases } from "../appwrite";
 import { toast } from "sonner";
 import { FocusCards } from "@/components/ui/focus-cards";
 
-export default function games() {
+export default function GamesPage() {
   const [games, setGames] = useState<Games[]>([]);
 
   useEffect(() => {

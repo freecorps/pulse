@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/app/stores/AuthStore";
 import { account, avatars, storage } from "@/app/appwrite";
-import { Models, OAuthProvider, ID, AuthenticationFactor } from "appwrite";
+import { Models, ID, AuthenticationFactor } from "appwrite";
 import { toast } from "sonner";
 import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { useRouter } from "next/navigation";
@@ -54,7 +54,6 @@ export default function Profile() {
     "confirm" | "recoveryCodes" | "setupMethod" | "verifyMethod"
   >("confirm");
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
-  const [totpSecret, setTotpSecret] = useState<string>("");
   const [totpUri, setTotpUri] = useState<string>("");
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [challengeID, setChallengeID] = useState<string | null>(null);
@@ -209,7 +208,6 @@ export default function Profile() {
         toast.error("Falha ao criar TOTP. Por favor, tente novamente.");
         return;
       }
-      setTotpSecret(otpCreated.secret);
       setTotpUri(otpCreated.uri);
       const qrCode = avatars.getQR(otpCreated.uri, 800, 0, false);
       setTotpUri(qrCode);

@@ -1,5 +1,5 @@
 import { create, StateCreator } from "zustand";
-import { persist, PersistOptions } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 import { account, ID } from "@/app/appwrite";
 import {
   AuthenticationFactor,

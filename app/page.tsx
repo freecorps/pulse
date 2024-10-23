@@ -40,7 +40,7 @@ export default function Home() {
 
   async function fetchPosts() {
     try {
-      let postsQuery = [Query.orderDesc("$createdAt")];
+      const postsQuery = [Query.orderDesc("$createdAt")];
 
       if (selectedGameIds.length > 0) {
         // Fetch posts for selected games
