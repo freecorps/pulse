@@ -1,0 +1,113 @@
+name: Next.js PR Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  build:
+    name: Next.js Build Validation
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Create Status Check
+      uses: actions/github-script@v6
+      id: check
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const { data: check } = await github.rest.checks.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            name: 'Next.js Build Status',
+            head_sha: context.payload.pull_request.head.sha,
+            status: 'in_progress',
+            started_at: new Date(),
+          });
+          return check.id;
+
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Lint and Build
+      id: build
+      run: |
+        echo "::set-output name=lint_status::pending"
+        echo "::set-output name=build_status::pending"
+        
+        if npm run lint; then
+          echo "::set-output name=lint_status::success"
+        else
+          echo "::set-output name=lint_status::failure"
+          exit 1
+        fi
+        
+        if npm run build; then
+          echo "::set-output name=build_status::success"
+        else
+          echo "::set-output name=build_status::failure"
+          exit 1
+        fi
+
+    - name: Update Status Check (Success)
+      if: success()
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const checkId = ${{ steps.check.outputs.result }};
+          await github.rest.checks.update({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            check_run_id: checkId,
+            status: 'completed',
+            conclusion: 'success',
+            completed_at: new Date(),
+            output: {
+              title: 'Build passou com sucesso',
+              summary: '✅ Lint e Build passaram com sucesso\n\n' +
+                      '- Lint Status: ✓\n' +
+                      '- Build Status: ✓'
+            }
+          });
+
+    - name: Update Status Check (Failure)
+      if: failure()
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const checkId = ${{ steps.check.outputs.result }};
+          const lintStatus = '${{ steps.build.outputs.lint_status }}';
+          const buildStatus = '${{ steps.build.outputs.build_status }}';
+          
+          let summary = '❌ O processo falhou:\n\n';
+          summary += `- Lint Status: ${lintStatus === 'success' ? '✓' : '❌'}\n`;
+          summary += `- Build Status: ${buildStatus === 'success' ? '✓' : '❌'}\n\n`;
+          summary += 'Por favor, verifique os logs da action para mais detalhes.';
+          
+          await github.rest.checks.update({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            check_run_id: checkId,
+            status: 'completed',
+            conclusion: 'failure',
+            completed_at: new Date(),
+            output: {
+              title: 'Build falhou',
+              summary: summary
+            }
+          });
