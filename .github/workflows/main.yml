@@ -1,10 +1,13 @@
-name: Next.js Build Test
+name: Next.js PR Build Test
 
 on:
-  push:
-    branches: [ main, develop ]
   pull_request:
-    branches: [ main, develop ]
+    types: [opened, synchronize, reopened]
+    # Você pode especificar branches específicas se desejar
+    branches:
+      - main
+      - develop
+      - 'releases/**'
 
 jobs:
   build:
@@ -27,11 +30,13 @@ jobs:
       run: npm ci
       
     - name: Lint check
+      id: lint
       run: npm run lint || exit 1
       
     - name: Build test
+      id: build
       run: npm run build || exit 1
-      
+
     - name: Cache build output
       uses: actions/cache@v3
       with:
@@ -41,3 +46,29 @@ jobs:
         key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
         restore-keys: |
           ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+    
+    - name: Comment PR on Success
+      if: success()
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '✅ Next.js build passou com sucesso!'
+          })
+          
+    - name: Comment PR on Failure
+      if: failure()
+      uses: actions/github-script@v6
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '❌ Next.js build falhou. Por favor, verifique os logs da action para mais detalhes.'
+          })
