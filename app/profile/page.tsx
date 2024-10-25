@@ -1,12 +1,12 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import Navbar from "@/components/navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/app/stores/AuthStore";
-import { account, avatars, storage } from "@/app/appwrite";
-import { Models, ID, AuthenticationFactor } from "appwrite";
+import { account, avatars } from "@/app/appwrite";
+import { Models, AuthenticationFactor } from "appwrite";
 import { toast } from "sonner";
 import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { useRouter } from "next/navigation";
@@ -19,6 +19,7 @@ import {
   CredenzaHeader,
   CredenzaTitle,
 } from "@/components/ui/credenza/credenza";
+import ProfilePictureUpload from "@/components/profilePictureUpload";
 
 const profileSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
@@ -57,7 +58,6 @@ export default function Profile() {
   const [totpUri, setTotpUri] = useState<string>("");
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [challengeID, setChallengeID] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -76,49 +76,6 @@ export default function Profile() {
       console.log(user.targets);
     }
   }, [user]);
-
-  const uploadProfilePicture = async (file: File) => {
-    if (!user) {
-      return;
-    }
-
-    toast.promise(
-      (async () => {
-        const newFileId = ID.unique();
-        await storage.createFile("profilePicture", newFileId, file);
-        const fileUrl = storage.getFileView("profilePicture", newFileId);
-
-        if (user.prefs?.profilePictureId) {
-          try {
-            await storage.deleteFile(
-              "profilePicture",
-              user.prefs.profilePictureId
-            );
-          } catch (error) {
-            console.error("Erro ao deletar a foto de perfil antiga:", error);
-          }
-        }
-
-        await updateProfilePicture(fileUrl, newFileId);
-        setProfilePicture(fileUrl);
-        return fileUrl;
-      })(),
-      {
-        loading: "Enviando foto de perfil...",
-        success: `Foto de perfil atualizada com sucesso!`,
-        error:
-          "Falha ao atualizar a foto de perfil. Por favor, tente novamente.",
-      }
-    );
-  };
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      uploadProfilePicture(file);
-    }
-    event.target.value = "";
-  };
 
   if (!user) {
     return (
@@ -285,35 +242,15 @@ export default function Profile() {
       <Navbar />
       <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
         <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full max-w-3xl">
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>Foto de Perfil</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center gap-4">
-              {profilePicture && (
-                <Image
-                  src={profilePicture}
-                  alt="Profile Picture"
-                  width={100}
-                  height={100}
-                  className="rounded-full"
-                />
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                ref={fileInputRef}
-                className="hidden"
-              />
-              <Button onClick={() => fileInputRef.current?.click()}>
-                {profilePicture
-                  ? "Atualizar Foto de Perfil"
-                  : "Enviar Foto de Perfil"}
-              </Button>
-            </CardContent>
-          </Card>
-
+          <ProfilePictureUpload
+            profilePicture={profilePicture}
+            userId={user?.$id}
+            onUpdateProfilePicture={async (fileUrl, fileId) => {
+              await updateProfilePicture(fileUrl, fileId);
+              setProfilePicture(fileUrl);
+            }}
+            userPrefs={user?.prefs}
+          />
           <Card className="w-full">
             <CardHeader>
               <CardTitle>Profile</CardTitle>

@@ -160,6 +160,7 @@ export default function AuthPage() {
                     onClick={async () => {
                       await loginWithOAuth(
                         OAuthProvider.Discord,
+                        window.location.origin + "/auth/redirect",
                         window.location.origin + "/auth/redirect"
                       );
                     }}
@@ -171,6 +172,7 @@ export default function AuthPage() {
                     onClick={async () => {
                       await loginWithOAuth(
                         OAuthProvider.Google,
+                        window.location.origin + "/auth/redirect",
                         window.location.origin + "/auth/redirect"
                       );
                     }}
@@ -228,6 +230,7 @@ export default function AuthPage() {
                     onClick={async () => {
                       await loginWithOAuth(
                         OAuthProvider.Discord,
+                        window.location.origin + "/auth/redirect",
                         window.location.origin + "/auth/redirect"
                       );
                     }}
@@ -239,6 +242,7 @@ export default function AuthPage() {
                     onClick={async () => {
                       await loginWithOAuth(
                         OAuthProvider.Google,
+                        window.location.origin + "/auth/redirect",
                         window.location.origin + "/auth/redirect"
                       );
                     }}

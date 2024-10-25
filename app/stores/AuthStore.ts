@@ -53,6 +53,7 @@ interface AuthState {
   setIsMfaRecovery: (isRecovery: boolean) => void;
   setMfaChallengeId: (id: string | null) => void;
   resetMfaState: () => void;
+  resetError: () => void;
 }
 
 type SessionMiddleware = <T extends AuthState>(
@@ -341,6 +342,10 @@ export const useAuthStore = create<AuthState>()(
 
       removeUser: () => {
         set({ user: null });
+      },
+
+      resetError: () => {
+        set({ error: null });
       },
 
       setMfaStep: (step) => set({ mfaStep: step }),

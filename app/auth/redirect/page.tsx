@@ -16,15 +16,28 @@ function RedirectSession() {
   const userId = searchParams.get("userId");
   const router = useRouter();
 
-  const { createSession, error, loading, user } = useAuthStore();
+  const { createSession, error, loading, user, setMfaChallengeRequired } =
+    useAuthStore();
 
   useEffect(() => {
-    if (secret && userId) {
-      createSession(userId, secret);
-    } else {
-      router.push("/auth");
+    async function create() {
+      if (secret && userId) {
+        await createSession(userId, secret);
+      } else {
+        router.push("/auth");
+      }
     }
+    create();
   }, [secret, userId, createSession, router]);
+
+  useEffect(() => {
+    if (
+      error === "More factors are required to complete the sign in process."
+    ) {
+      setMfaChallengeRequired(true);
+      router.push("/auth/");
+    }
+  }, [error, setMfaChallengeRequired, router]);
 
   if (user) {
     router.push("/");
