@@ -101,7 +101,7 @@ const ProfilePictureUpload: React.FC<ProfilePictureUploadProps> = ({
         URL.revokeObjectURL(tempPreviewUrl);
       }
     }
-  }, [selectedFile, tempPreviewUrl]);
+  }, [selectedFile, tempPreviewUrl, uploadProfilePicture]);
 
   const handleCancelUpload = useCallback(() => {
     setShowConfirmDialog(false);

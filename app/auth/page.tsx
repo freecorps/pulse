@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FaDiscord, FaGoogle } from "react-icons/fa";
 import MFAChallenge from "@/components/mfaChallenge";
+import FullPageLoading from "@/components/full-page-loading";
 
 const Separator: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="flex items-center my-4">
@@ -91,7 +92,7 @@ export default function AuthPage() {
   }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <FullPageLoading message="Carregando..." />;
   }
 
   if (isMFAChallengeRequired && mfaFactors) {
