@@ -73,7 +73,6 @@ export default function Profile() {
       fetchSessions();
       checkMfaStatus();
       setProfilePicture(user.prefs?.profilePictureUrl);
-      console.log(user.targets);
     }
   }, [user]);
 
