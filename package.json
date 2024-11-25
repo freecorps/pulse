@@ -34,6 +34,7 @@
     "@tiptap/extension-image": "^2.10.2",
     "@tiptap/react": "^2.10.2",
     "@tiptap/starter-kit": "^2.10.2",
+    "@tiptap/suggestion": "^2.10.2",
     "appwrite": "^16.0.2",
     "appwrite-typer": "^0.0.1",
     "class-variance-authority": "^0.7.0",

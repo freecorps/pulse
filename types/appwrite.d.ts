@@ -7,6 +7,7 @@ export interface Posts extends Models.Document {
     description: string;
     games?: Games;
     editors?: Editors;
+    content?: string;
 };
 
 export interface Editors extends Models.Document {

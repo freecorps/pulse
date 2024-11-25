@@ -1,6 +1,7 @@
-import { Client, Account, Storage, Databases, Avatars } from "appwrite";
+import { Client, Account, Storage, Databases, Avatars, Teams } from "appwrite";
 
 export const client = new Client();
+export const teams = new Teams(client);
 
 client.setEndpoint("https://appwrite.freecorps.xyz/v1").setProject("pulse");
 
