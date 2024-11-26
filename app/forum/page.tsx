@@ -1,25 +1,18 @@
-import Navbar from "@/components/navbar";
-import { Jimmy } from "@/components/typewriter-effect";
+import React from "react";
+import { Forumeffect } from "@/components/typewriter-effect";
+import { ForumPosts } from "@/components/forum/forum-posts";
 
-function teste() {
-    return (
-        <div>ola</div>
-    );
-}
-
-
-
-export default function forum(){
-
-    return(
-        <div>
-            <Navbar/>
-            <div>
-                <Jimmy></Jimmy>
-            </div>
-            <div className="flex flex-col">
-                {teste()}
-            </div>
+export default function Forum() {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-1">
+        <div className="container max-w-4xl py-8 space-y-8">
+          <div className="text-center flex flex-col items-center">
+            <Forumeffect />
+          </div>
+          <ForumPosts />
         </div>
-    );
+      </main>
+    </div>
+  );
 }

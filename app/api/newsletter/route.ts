@@ -1,8 +1,16 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const apiKey = process.env.RESEND_API_KEY;
+const resend = apiKey ? new Resend(apiKey) : null;
 
 export async function POST(request: Request) {
+  if (!resend) {
+    return new Response(
+      JSON.stringify({ error: "Newsletter service is not configured" }),
+      { status: 503 }
+    );
+  }
+
   try {
     const { email } = await request.json();
 
