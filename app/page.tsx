@@ -9,12 +9,14 @@ import { Posts, Games } from "@/types/appwrite";
 import { Query } from "appwrite";
 import { Skeleton } from "@/components/ui/skeleton";
 import { databases } from "./appwrite";
+import { useAuthStore } from "@/app/stores/AuthStore";
 
 export default function Home() {
   const [posts, setPosts] = useState<Posts[]>([]);
   const [games, setGames] = useState<Games[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedGameIds, setSelectedGameIds] = useState<string[]>([]);
+  const { user } = useAuthStore();
 
   useEffect(() => {
     async function fetchData() {
@@ -22,6 +24,11 @@ export default function Home() {
         // Fetch games
         const gamesResponse = await databases.listDocuments("news", "games");
         setGames(gamesResponse.documents as Games[]);
+
+        // Se o usuário estiver logado, use seus jogos favoritos
+        if (user?.prefs?.favoriteGames) {
+          setSelectedGameIds(user.prefs.favoriteGames);
+        }
 
         // Initially fetch all posts
         await fetchPosts();
@@ -32,7 +39,7 @@ export default function Home() {
       }
     }
     fetchData();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchPosts();
