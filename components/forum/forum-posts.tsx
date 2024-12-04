@@ -57,7 +57,7 @@ export function ForumPosts() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-4xl mx-auto space-y-6 px-4">
       <div className="flex justify-between items-center gap-4">
         <h2 className="text-2xl font-bold">Discussões Recentes</h2>
         {user && (
@@ -69,20 +69,22 @@ export function ForumPosts() {
         )}
       </div>
 
-      <div className="space-y-4">
+      <div className="grid gap-4">
         {posts.map((post) => (
           <div
             key={post.$id}
-            className="p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+            className="p-6 rounded-lg border border-border hover:bg-muted/50 transition-colors"
           >
-            <Link href={`/forum/${post.$id}`}>
-              <h3 className="text-lg font-medium">{post.title}</h3>
+            <Link href={`/forum/${post.$id}`} className="block">
+              <h3 className="text-xl font-medium hover:text-primary transition-colors">
+                {post.title}
+              </h3>
               {post.description && (
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-muted-foreground mt-2">
                   {post.description}
                 </p>
               )}
-              <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
                 <span>
                   {new Date(post.$createdAt).toLocaleDateString("pt-BR")}
                 </span>
@@ -96,7 +98,7 @@ export function ForumPosts() {
         ))}
       </div>
 
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-2 mt-8">
         <Button
           variant="outline"
           disabled={currentPage === 1}

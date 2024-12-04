@@ -9,6 +9,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { MultiSelect } from "@/components/multi-select";
 import { Posts } from "@/types/appwrite";
+import Link from "next/link";
 
 interface NewsListProps {
   newsItems: Posts[];
@@ -39,16 +40,16 @@ export function NewsList({
       </div>
       {newsItems.map((news, index) => (
         <div key={news.$id}>
-          <a>
-            <Card className="flex flex-row md:flex-row cursor-pointer hover:shadow-md transition-shadow overflow-hidden">
+          <Link href={`/news/${news.$id}`}>
+            <Card className="flex flex-row md:flex-row cursor-pointer hover:shadow-lg hover:scale-[1.01] transition-all duration-200 overflow-hidden group">
               <img
                 src={news.imageURL}
                 alt={news.title}
-                className="w-full md:w-1/3 h-48 md:h-auto object-cover rounded-t-md md:rounded-l-md md:rounded-t-none"
+                className="w-full md:w-1/3 h-48 md:h-auto object-cover rounded-t-md md:rounded-l-md md:rounded-t-none group-hover:brightness-90 transition-all"
               />
               <div className="flex flex-col justify-between p-4 w-full">
                 <CardHeader>
-                  <CardTitle className="text-2xl font-bold">
+                  <CardTitle className="text-2xl font-bold group-hover:text-primary transition-colors">
                     {news.title}
                   </CardTitle>
                 </CardHeader>
@@ -65,7 +66,7 @@ export function NewsList({
                 </CardFooter>
               </div>
             </Card>
-          </a>
+          </Link>
           {index < newsItems.length - 1 && <Separator className="my-8" />}
         </div>
       ))}

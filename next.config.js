@@ -23,6 +23,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: '*.amazonaws.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'appwrite.freecorps.xyz',
+      }
       // Adicione outros domínios conforme necessário
     ],
   },
