@@ -258,6 +258,7 @@ export default function Profile() {
       toast.success("Jogos favoritos atualizados com sucesso!");
     } catch (error) {
       toast.error("Falha ao atualizar jogos favoritos");
+      console.error("Erro ao atualizar jogos favoritos:", error);
     }
   };
 
