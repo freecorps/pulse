@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { ID, Permission, Role } from "appwrite";
+import { FileInput } from "@/components/ui/file-input/FileInput";
 
 interface GameForm {
   name: string;
@@ -90,23 +91,19 @@ export default function CreateGame() {
 
           <div className="space-y-2">
             <Label htmlFor="imageURL">URL da Imagem *</Label>
-            <Input
-              id="imageURL"
+            <FileInput
               value={form.imageURL}
-              onChange={(e) => handleFieldUpdate("imageURL", e.target.value)}
-              placeholder="URL da imagem do jogo"
+              onChange={(value) => handleFieldUpdate("imageURL", value)}
+              placeholder="Selecione ou cole o link da imagem do jogo"
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="IamgeURLUpper">URL da Imagem de Capa</Label>
-            <Input
-              id="IamgeURLUpper"
-              value={form.IamgeURLUpper}
-              onChange={(e) =>
-                handleFieldUpdate("IamgeURLUpper", e.target.value)
-              }
-              placeholder="URL da imagem de capa (opcional)"
+            <FileInput
+              value={form.IamgeURLUpper || ""}
+              onChange={(value) => handleFieldUpdate("IamgeURLUpper", value)}
+              placeholder="Selecione ou cole o link da imagem de capa"
             />
           </div>
         </div>

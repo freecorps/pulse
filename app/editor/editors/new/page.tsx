@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { ID, Permission, Role } from "appwrite";
+import { FileInput } from "@/components/ui/file-input/FileInput";
 
 interface EditorForm {
   name: string;
@@ -77,11 +78,10 @@ export default function CreateEditor() {
 
           <div className="space-y-2">
             <Label htmlFor="imageURL">URL da Foto</Label>
-            <Input
-              id="imageURL"
-              value={form.imageURL}
-              onChange={(e) => handleFieldUpdate("imageURL", e.target.value)}
-              placeholder="URL da foto do editor"
+            <FileInput
+              value={form.imageURL || ""}
+              onChange={(value) => handleFieldUpdate("imageURL", value)}
+              placeholder="Selecione ou cole o link da foto do editor"
             />
           </div>
 

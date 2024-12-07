@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { use } from "react";
+import { FileInput } from "@/components/ui/file-input/FileInput";
 
 interface EditGameProps {
   params: Promise<{ id: string }>;
@@ -44,14 +45,23 @@ export default function EditGame({ params }: EditGameProps) {
       await databases.updateDocument("News", "games", id, {
         [field]: value,
       });
-      toast.success("Alterações salvas");
+      toast.success("Alterações salvas com sucesso!");
     } catch (error) {
       console.error(error);
       toast.error("Erro ao salvar alterações");
+      setGame((prev) => prev);
     }
   };
 
-  if (!game) return <div>Carregando...</div>;
+  if (!game) {
+    return (
+      <div className="container max-w-4xl py-8">
+        <div className="flex items-center justify-center h-32">
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container max-w-4xl py-8 space-y-8">
@@ -83,23 +93,19 @@ export default function EditGame({ params }: EditGameProps) {
 
           <div className="space-y-2">
             <Label htmlFor="imageURL">URL da Imagem *</Label>
-            <Input
-              id="imageURL"
+            <FileInput
               value={game.imageURL}
-              onChange={(e) => handleFieldUpdate("imageURL", e.target.value)}
-              placeholder="URL da imagem do jogo"
+              onChange={(value) => handleFieldUpdate("imageURL", value)}
+              placeholder="Selecione ou cole o link da imagem do jogo"
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="IamgeURLUpper">URL da Imagem de Capa</Label>
-            <Input
-              id="IamgeURLUpper"
+            <FileInput
               value={game.IamgeURLUpper || ""}
-              onChange={(e) =>
-                handleFieldUpdate("IamgeURLUpper", e.target.value)
-              }
-              placeholder="URL da imagem de capa (opcional)"
+              onChange={(value) => handleFieldUpdate("IamgeURLUpper", value)}
+              placeholder="Selecione ou cole o link da imagem de capa"
             />
           </div>
         </div>

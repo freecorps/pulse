@@ -1,26 +1,24 @@
+import { useState, useEffect } from "react";
+import { storage, ID } from "@/app/appwrite";
+import { Permission, Role } from "appwrite";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
-import { Editor } from "@tiptap/react";
-import { storage, ID } from "@/app/appwrite";
-import { Permission, Role } from "appwrite";
 import { toast } from "sonner";
 import Image from "next/image";
 import { FileUp, Trash2, Clock, FileIcon } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
 
-interface ImageModalProps {
-  editor: Editor;
+interface FileModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSelect: (url: string) => void;
 }
 
 interface FileItem {
@@ -32,8 +30,7 @@ interface FileItem {
   $createdAt: string;
 }
 
-export function ImageModal({ editor, open, onOpenChange }: ImageModalProps) {
-  const [url, setUrl] = useState("");
+export function FileModal({ open, onOpenChange, onSelect }: FileModalProps) {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("browse");
@@ -132,26 +129,17 @@ export function ImageModal({ editor, open, onOpenChange }: ImageModalProps) {
     return Math.round(bytes / Math.pow(1024, i)) + " " + sizes[i];
   };
 
-  const addImage = (imageUrl: string) => {
-    if (imageUrl) {
-      editor.chain().focus().setImage({ src: imageUrl }).run();
-      setUrl("");
-      onOpenChange(false);
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Adicionar Imagem</DialogTitle>
+          <DialogTitle>Gerenciador de Arquivos</DialogTitle>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="browse">Biblioteca</TabsTrigger>
             <TabsTrigger value="upload">Upload</TabsTrigger>
-            <TabsTrigger value="url">URL</TabsTrigger>
           </TabsList>
 
           <TabsContent value="browse" className="min-h-[400px]">
@@ -169,7 +157,12 @@ export function ImageModal({ editor, open, onOpenChange }: ImageModalProps) {
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-center items-center gap-2 p-4">
-                      <Button onClick={() => addImage(file.url)}>
+                      <Button
+                        onClick={() => {
+                          onSelect(file.url);
+                          onOpenChange(false);
+                        }}
+                      >
                         Selecionar
                       </Button>
                       <Button
@@ -246,29 +239,6 @@ export function ImageModal({ editor, open, onOpenChange }: ImageModalProps) {
                 <p className="text-xs text-muted-foreground">
                   Suporta imagens e GIFs até 10MB
                 </p>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="url" className="min-h-[400px]">
-            <div className="p-4 space-y-4">
-              <div className="space-y-2">
-                <Input
-                  placeholder="Cole o link da imagem aqui..."
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      addImage(url);
-                    }
-                  }}
-                />
-                <p className="text-sm text-muted-foreground">
-                  Cole o link direto para uma imagem da web
-                </p>
-              </div>
-              <div className="flex justify-end">
-                <Button onClick={() => addImage(url)}>Adicionar</Button>
               </div>
             </div>
           </TabsContent>

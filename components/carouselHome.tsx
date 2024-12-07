@@ -15,6 +15,7 @@ import { databases } from "@/app/appwrite";
 import { Query } from "appwrite";
 import { Posts } from "@/types/appwrite";
 import Link from "next/link";
+import Image from "next/image";
 
 export function CarouselHome() {
   const [api, setApi] = useState<CarouselApi>();
@@ -74,7 +75,7 @@ export function CarouselHome() {
                 <div className="p-2">
                   <Card className="w-full h-64 md:h-80 lg:h-96 overflow-hidden group cursor-pointer">
                     <CardContent className="flex flex-col items-center justify-center h-full p-8 relative">
-                      <img
+                      <Image
                         src={post.imageURL}
                         alt={post.title}
                         className="w-full h-full object-cover absolute inset-0 group-hover:scale-105 transition-transform duration-200"
