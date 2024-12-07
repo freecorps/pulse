@@ -11,14 +11,19 @@ interface FileInputProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  bucketId?: string;
 }
 
-export function FileInput({ value, onChange, placeholder }: FileInputProps) {
+export function FileInput({
+  value,
+  onChange,
+  placeholder,
+  bucketId = "userFiles",
+}: FileInputProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditor, setIsEditor] = useState(false);
   const { user } = useAuthStore();
 
-  // Verifica se o usuário é editor
   useEffect(() => {
     async function checkEditorPermission() {
       if (!user) return;
@@ -70,6 +75,7 @@ export function FileInput({ value, onChange, placeholder }: FileInputProps) {
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         onSelect={onChange}
+        bucketId={bucketId}
       />
     </div>
   );

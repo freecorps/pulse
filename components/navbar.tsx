@@ -12,7 +12,7 @@ import {
 import { useAuthStore } from "@/app/stores/AuthStore";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./modeTogle";
-import { LogOut, Menu, User } from "lucide-react";
+import { LogOut, Menu, User, MessageCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,7 +27,7 @@ import { siteLinks } from "@/config/site";
 import { SearchCommand } from "./search-command";
 import { useState, useEffect } from "react";
 import { Query } from "appwrite";
-import { teams } from "@/app/appwrite";
+import { teams, databases } from "@/app/appwrite";
 import Image from "next/image";
 
 export default function Navbar() {
@@ -124,6 +124,8 @@ interface UserMenuProps {
 function UserMenu({ user, logout }: UserMenuProps) {
   const [isEditor, setIsEditor] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
+  const [hasForumProfile, setHasForumProfile] = useState(false);
+  const [forumProfileId, setForumProfileId] = useState<string | null>(null);
 
   useEffect(() => {
     async function checkPermissions() {
@@ -147,6 +149,21 @@ function UserMenu({ user, logout }: UserMenuProps) {
       } catch (error) {
         console.error("Erro ao verificar permissão premium:", error);
         setIsPremium(false);
+      }
+
+      // Verifica perfil do fórum
+      try {
+        const forumProfile = await databases.listDocuments("forum", "perfil", [
+          Query.equal("userId", user.$id),
+        ]);
+
+        setHasForumProfile(forumProfile.total > 0);
+        if (forumProfile.total > 0) {
+          setForumProfileId(forumProfile.documents[0].$id);
+        }
+      } catch (error) {
+        console.error("Erro ao verificar perfil do fórum:", error);
+        setHasForumProfile(false);
       }
     }
 
@@ -187,11 +204,29 @@ function UserMenu({ user, logout }: UserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href="./profile" className="flex items-center">
+            <Link href="/profile" className="flex items-center">
               <User className="mr-2 h-4 w-4" />
               <span>Perfil</span>
             </Link>
           </DropdownMenuItem>
+          {hasForumProfile ? (
+            <DropdownMenuItem asChild>
+              <Link
+                href={`/forum/profile/${forumProfileId}`}
+                className="flex items-center"
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                <span>Perfil do Fórum</span>
+              </Link>
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem asChild>
+              <Link href="/forum/profile/new" className="flex items-center">
+                <MessageCircle className="mr-2 h-4 w-4" />
+                <span>Criar Perfil do Fórum</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
         </DropdownMenuGroup>
         {(isEditor || isPremium) && (
           <>

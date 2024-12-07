@@ -19,6 +19,7 @@ interface FileModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSelect: (url: string) => void;
+  bucketId: string;
 }
 
 interface FileItem {
@@ -30,7 +31,12 @@ interface FileItem {
   $createdAt: string;
 }
 
-export function FileModal({ open, onOpenChange, onSelect }: FileModalProps) {
+export function FileModal({
+  open,
+  onOpenChange,
+  onSelect,
+  bucketId,
+}: FileModalProps) {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("browse");
@@ -44,11 +50,11 @@ export function FileModal({ open, onOpenChange, onSelect }: FileModalProps) {
 
   const loadFiles = async () => {
     try {
-      const fileList = await storage.listFiles("userFiles");
+      const fileList = await storage.listFiles(bucketId);
       const filesWithUrls = fileList.files.map((file) => ({
         $id: file.$id,
         name: file.name,
-        url: storage.getFileView("userFiles", file.$id),
+        url: storage.getFileView(bucketId, file.$id),
         mimeType: file.mimeType,
         sizeOriginal: file.sizeOriginal,
         $createdAt: file.$createdAt,
@@ -91,7 +97,7 @@ export function FileModal({ open, onOpenChange, onSelect }: FileModalProps) {
 
     toast.promise(
       storage
-        .createFile("userFiles", fileId, file, [
+        .createFile(bucketId, fileId, file, [
           Permission.read(Role.any()),
           Permission.write(Role.team("editor")),
           Permission.update(Role.team("editor")),
@@ -111,7 +117,7 @@ export function FileModal({ open, onOpenChange, onSelect }: FileModalProps) {
 
   const handleDelete = async (fileId: string) => {
     toast.promise(
-      storage.deleteFile("userFiles", fileId).then(() => {
+      storage.deleteFile(bucketId, fileId).then(() => {
         setFiles(files.filter((file) => file.$id !== fileId));
       }),
       {

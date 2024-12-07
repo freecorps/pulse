@@ -1,19 +1,21 @@
 "use client";
 import { databases } from "@/app/appwrite";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { ID, Permission, Role } from "appwrite";
+import { ID, Permission, Role, Query } from "appwrite";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuthStore } from "@/app/stores/AuthStore";
+import { getUserProfile } from "../utils/profile";
 
 interface ForumPost {
   title: string;
   description: string;
   content: string;
+  perfil?: string[];
 }
 
 const initialForm: ForumPost = {
@@ -22,11 +24,34 @@ const initialForm: ForumPost = {
   content: "",
 };
 
+const checkUserProfile = async (userId: string) => {
+  try {
+    const response = await databases.listDocuments("forum", "perfil", [
+      Query.equal("userId", userId),
+    ]);
+    return response.total > 0;
+  } catch (error) {
+    console.error("Erro ao verificar perfil:", error);
+    return false;
+  }
+};
+
 export default function CreateForumPost() {
   const { user } = useAuthStore();
   const router = useRouter();
   const [form, setForm] = useState<ForumPost>(initialForm);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      checkUserProfile(user.$id).then((hasProfile) => {
+        if (!hasProfile) {
+          toast.error("Você precisa criar um perfil para fazer postagens");
+          router.push("/forum/profile/new");
+        }
+      });
+    }
+  }, [user]);
 
   if (!user) {
     return (
@@ -50,12 +75,31 @@ export default function CreateForumPost() {
         return;
       }
 
-      await databases.createDocument("forum", "posts", ID.unique(), form, [
-        Permission.read(Role.any()),
-        Permission.write(Role.user(user?.$id)),
-        Permission.update(Role.user(user?.$id)),
-        Permission.delete(Role.user(user?.$id)),
-      ]);
+      const userProfile = await getUserProfile(user.$id);
+      if (!userProfile) {
+        toast.error("Perfil não encontrado");
+        router.push("/forum/profile/new");
+        return;
+      }
+
+      await databases.createDocument(
+        "forum",
+        "posts",
+        ID.unique(),
+        {
+          title: form.title,
+          description: form.description,
+          content: form.content,
+          userId: user.$id,
+          perfil: userProfile.$id,
+        },
+        [
+          Permission.read(Role.any()),
+          Permission.write(Role.user(user.$id)),
+          Permission.update(Role.user(user.$id)),
+          Permission.delete(Role.user(user.$id)),
+        ]
+      );
 
       toast.success("Post criado com sucesso!");
       router.push("/forum");

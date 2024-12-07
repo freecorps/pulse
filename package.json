@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "types": "aw-typer generate -c appwrite-config.json -o types/"
+    "types": "aw-typer generate -c appwrite-config.json -o typesForum/"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
