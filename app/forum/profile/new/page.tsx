@@ -143,6 +143,7 @@ export default function CreateForumProfile() {
               value={form.imgURL}
               onChange={(value) => handleFieldUpdate("imgURL", value)}
               placeholder="Selecione ou cole o link da sua foto de perfil"
+              bucketId="forumFiles"
             />
           </div>
         </div>
