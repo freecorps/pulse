@@ -33,7 +33,6 @@ export function NewsList({
           defaultValue={selectedTypes}
           placeholder="Filtrar notícias por jogo"
           variant="inverted"
-          animation={2}
           maxCount={3}
           className="w-auto"
         />
@@ -41,22 +40,24 @@ export function NewsList({
       {newsItems.map((news, index) => (
         <div key={news.$id}>
           <Link href={`/news/${news.$id}`}>
-            <Card className="flex flex-row md:flex-row cursor-pointer hover:shadow-lg hover:scale-[1.01] transition-all duration-200 overflow-hidden group">
-              <img
-                src={news.imageURL}
-                alt={news.title}
-                className="w-full md:w-1/3 h-48 md:h-auto object-cover rounded-t-md md:rounded-l-md md:rounded-t-none group-hover:brightness-90 transition-all"
-              />
+            <Card className="flex flex-col md:flex-row cursor-pointer hover:shadow-lg hover:scale-[1.01] transition-all duration-200 overflow-hidden group">
+              <div className="w-full md:w-1/3 h-48 relative">
+                <img
+                  src={news.imageURL}
+                  alt={news.title}
+                  className="w-full h-full object-cover rounded-t-md md:rounded-l-md md:rounded-t-none group-hover:brightness-90 transition-all"
+                />
+              </div>
               <div className="flex flex-col justify-between p-4 w-full">
-                <CardHeader>
-                  <CardTitle className="text-2xl font-bold group-hover:text-primary transition-colors">
+                <CardHeader className="p-0 md:p-4">
+                  <CardTitle className="text-xl md:text-2xl font-bold group-hover:text-primary transition-colors">
                     {news.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-sm text-muted-foreground">
+                <CardContent className="text-sm text-muted-foreground px-0 md:px-4 py-2 md:py-4">
                   {news.description}
                 </CardContent>
-                <CardFooter className="flex justify-between">
+                <CardFooter className="flex justify-between px-0 md:px-4">
                   <span className="text-sm text-muted-foreground">
                     {news.games?.name}
                   </span>

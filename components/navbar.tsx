@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from "./ui/sheet";
 import { useAuthStore } from "@/app/stores/AuthStore";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./modeTogle";
@@ -18,6 +24,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Models } from "appwrite";
 import { siteLinks } from "@/config/site";
+import { SearchCommand } from "./search-command";
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
@@ -39,6 +46,7 @@ export default function Navbar() {
             </nav>
           </div>
           <div className="flex items-center gap-4">
+            <SearchCommand />
             {user ? (
               <>
                 <UserMenu user={user} logout={logout} />
@@ -65,10 +73,15 @@ export default function Navbar() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right">
-                <nav className="flex flex-col gap-4">
+                <SheetHeader>
+                  <SheetTitle>Menu de Navegação</SheetTitle>
+                </SheetHeader>
+                <nav className="flex flex-col gap-4 mt-6">
                   {siteLinks.map((item) => (
                     <Link key={item.name} href={item.href} prefetch={false}>
-                      <Button variant="ghost">{item.name}</Button>
+                      <Button variant="ghost" className="w-full justify-start">
+                        {item.name}
+                      </Button>
                     </Link>
                   ))}
                   {!user && (
