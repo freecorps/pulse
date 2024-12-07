@@ -91,7 +91,7 @@ export default function ForumPost() {
   }
 
   return (
-    <div className="container max-w-4xl py-8 space-y-8">
+    <div className="w-full max-w-4xl mx-auto py-8 space-y-8 px-4">
       <Button variant="ghost" asChild className="mb-4">
         <Link href="/forum">
           <ArrowLeft className="mr-2 h-4 w-4" />

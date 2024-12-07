@@ -23,4 +23,8 @@ export const siteLinks = [
     name: "Times",
     href: "/teams",
   },
+  {
+    name: "Editores",
+    href: "/editors",
+  },
 ];

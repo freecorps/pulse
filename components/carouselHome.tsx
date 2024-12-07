@@ -14,6 +14,7 @@ import {
 import { databases } from "@/app/appwrite";
 import { Query } from "appwrite";
 import { Posts } from "@/types/appwrite";
+import Link from "next/link";
 
 export function CarouselHome() {
   const [api, setApi] = useState<CarouselApi>();
@@ -59,30 +60,37 @@ export function CarouselHome() {
         className="w-full"
         onMouseEnter={plugin.current.stop}
         onMouseLeave={plugin.current.reset}
-        opts={{ loop: true }}
+        opts={{
+          loop: true,
+          duration: 20,
+        }}
         setApi={setApi}
       >
         <h1 className="text-2xl font-bold mb-4">Destaques e Recomendados</h1>
         <CarouselContent className="space-x-4 px-4">
           {featuredPosts.map((post) => (
             <CarouselItem key={post.$id} className="flex-shrink-0 w-full">
-              <div className="p-2">
-                <Card className="w-full h-64 md:h-80 lg:h-96 overflow-hidden">
-                  <CardContent className="flex flex-col items-center justify-center h-full p-8 relative">
-                    <img
-                      src={post.imageURL}
-                      alt={post.title}
-                      className="w-full h-full object-cover absolute inset-0"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-4">
-                      <h2 className="text-2xl font-bold text-white mb-2">
-                        {post.title}
-                      </h2>
-                      <p className="text-white">{post.description}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              <Link href={`/news/${post.$id}`}>
+                <div className="p-2">
+                  <Card className="w-full h-64 md:h-80 lg:h-96 overflow-hidden group cursor-pointer">
+                    <CardContent className="flex flex-col items-center justify-center h-full p-8 relative">
+                      <img
+                        src={post.imageURL}
+                        alt={post.title}
+                        className="w-full h-full object-cover absolute inset-0 group-hover:scale-105 transition-transform duration-200"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-50 group-hover:bg-opacity-40 transition-all flex flex-col justify-end p-4">
+                        <h2 className="text-2xl font-bold text-white mb-2 group-hover:text-primary transition-colors">
+                          {post.title}
+                        </h2>
+                        <p className="text-white group-hover:text-white/90 transition-colors">
+                          {post.description}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </Link>
             </CarouselItem>
           ))}
         </CarouselContent>

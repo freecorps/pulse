@@ -28,6 +28,7 @@ export const Card = React.memo(
         alt={card.title}
         layout="fill"
         className="object-cover w-full h-full absolute inset-0"
+        unoptimized
       />
       <div
         className={cn(

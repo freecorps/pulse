@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from "./ui/sheet";
 import { useAuthStore } from "@/app/stores/AuthStore";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./modeTogle";
@@ -18,6 +24,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Models } from "appwrite";
 import { siteLinks } from "@/config/site";
+import { SearchCommand } from "./search-command";
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
@@ -27,9 +34,8 @@ export default function Navbar() {
       <div className="container h-full mx-auto px-4">
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center" prefetch={false}>
-              <MountainIcon className="h-6 w-6" />
-              <span className="sr-only">Pulse</span>
+            <Link href="/" className="flex items-center gap-2" prefetch={false}>
+              <Logo className="h-7 w-7" />
             </Link>
             <nav className="hidden lg:flex items-center gap-4">
               {siteLinks.map((item) => (
@@ -40,6 +46,7 @@ export default function Navbar() {
             </nav>
           </div>
           <div className="flex items-center gap-4">
+            <SearchCommand />
             {user ? (
               <>
                 <UserMenu user={user} logout={logout} />
@@ -66,10 +73,15 @@ export default function Navbar() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right">
-                <nav className="flex flex-col gap-4">
+                <SheetHeader>
+                  <SheetTitle>Menu de Navegação</SheetTitle>
+                </SheetHeader>
+                <nav className="flex flex-col gap-4 mt-6">
                   {siteLinks.map((item) => (
                     <Link key={item.name} href={item.href} prefetch={false}>
-                      <Button variant="ghost">{item.name}</Button>
+                      <Button variant="ghost" className="w-full justify-start">
+                        {item.name}
+                      </Button>
                     </Link>
                   ))}
                   {!user && (
@@ -150,23 +162,14 @@ function UserMenu({ user, logout }: UserMenuProps) {
   );
 }
 
-function MountainIcon(
-  props: React.JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
-) {
+function Logo(props: React.HTMLAttributes<HTMLImageElement>) {
   return (
-    <svg
+    <img
       {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
-    </svg>
+      src="/favicon.ico"
+      alt="Logo do site"
+      width={24}
+      height={24}
+    />
   );
 }

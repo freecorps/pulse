@@ -20,6 +20,9 @@ import {
   CredenzaTitle,
 } from "@/components/ui/credenza/credenza";
 import ProfilePictureUpload from "@/components/profilePictureUpload";
+import { MultiSelect } from "@/components/multi-select";
+import { databases } from "@/app/appwrite";
+import { Games } from "@/types/appwrite";
 
 const profileSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
@@ -45,6 +48,7 @@ export default function Profile() {
     createTotp,
     verifyAuthenticator,
     updateMFA,
+    updateFavoriteGames,
   } = useAuthStore();
   const [sessions, setSessions] = useState<Models.Session[]>([]);
   const [mfaEnabled, setMfaEnabled] = useState(false);
@@ -58,6 +62,7 @@ export default function Profile() {
   const [totpUri, setTotpUri] = useState<string>("");
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [challengeID, setChallengeID] = useState<string | null>(null);
+  const [games, setGames] = useState<Games[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -65,6 +70,7 @@ export default function Profile() {
       fetchSessions();
       checkMfaStatus();
       setProfilePicture(user.prefs?.profilePictureUrl);
+      fetchGames();
     }
   }, [user]);
 
@@ -236,6 +242,26 @@ export default function Profile() {
     }
   };
 
+  const fetchGames = async () => {
+    try {
+      const gamesResponse = await databases.listDocuments("news", "games");
+      setGames(gamesResponse.documents as Games[]);
+    } catch (error) {
+      console.error("Erro ao buscar jogos:", error);
+      toast.error("Falha ao buscar jogos");
+    }
+  };
+
+  const handleFavoriteGamesChange = async (selectedGames: string[]) => {
+    try {
+      await updateFavoriteGames(selectedGames);
+      toast.success("Jogos favoritos atualizados com sucesso!");
+    } catch (error) {
+      toast.error("Falha ao atualizar jogos favoritos");
+      console.error("Erro ao atualizar jogos favoritos:", error);
+    }
+  };
+
   return (
     <div>
       <Navbar />
@@ -332,6 +358,24 @@ export default function Profile() {
               ) : (
                 <Button onClick={startMfaSetup}>Habilitar MFA</Button>
               )}
+            </CardContent>
+          </Card>
+
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Jogos Favoritos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <MultiSelect
+                options={games.map((game) => ({
+                  value: game.$id,
+                  label: game.abbreviation || game.name,
+                }))}
+                onValueChange={handleFavoriteGamesChange}
+                defaultValue={user?.prefs?.favoriteGames || []}
+                placeholder="Selecione seus jogos favoritos"
+                className="w-full"
+              />
             </CardContent>
           </Card>
 

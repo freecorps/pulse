@@ -54,6 +54,7 @@ interface AuthState {
   setMfaChallengeId: (id: string | null) => void;
   resetMfaState: () => void;
   resetError: () => void;
+  updateFavoriteGames: (gameIds: string[]) => Promise<void>;
 }
 
 type SessionMiddleware = <T extends AuthState>(
@@ -290,7 +291,9 @@ export const useAuthStore = create<AuthState>()(
       updateProfilePicture: async (url: string, oldID: string) => {
         set({ loading: true, error: null });
         try {
+          const currentUser = await account.get();
           await account.updatePrefs({
+            ...currentUser.prefs,
             profilePictureUrl: url,
             profilePictureId: oldID,
           });
@@ -359,6 +362,22 @@ export const useAuthStore = create<AuthState>()(
           isMfaRecovery: false,
           mfaChallengeId: null,
         }),
+
+      updateFavoriteGames: async (gameIds: string[]) => {
+        set({ loading: true, error: null });
+        try {
+          const currentUser = await account.get();
+          await account.updatePrefs({
+            ...currentUser.prefs,
+            favoriteGames: gameIds,
+          });
+          const user = await account.get();
+          set({ user });
+          set({ loading: false });
+        } catch (error) {
+          set({ error: (error as Error).message, loading: false });
+        }
+      },
     })),
     {
       name: "auth-storage",
