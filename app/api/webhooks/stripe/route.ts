@@ -4,23 +4,33 @@ import { Client, Teams, Databases } from "node-appwrite";
 import { Permission, Query, Role } from "appwrite";
 import { ID } from "appwrite";
 
-// Inicializa o Server SDK do Appwrite
-const client = new Client()
-  .setEndpoint("https://appwrite.freecorps.xyz/v1")
-  .setProject("pulse")
-  .setKey(process.env.APPWRITE_API_KEY!); // Chave API secreta do servidor
+const appwriteKey = process.env.APPWRITE_API_KEY;
+const stripeKey = process.env.STRIPE_SECRET_KEY;
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-const teams = new Teams(client);
+const client = appwriteKey
+  ? new Client()
+      .setEndpoint("https://appwrite.freecorps.xyz/v1")
+      .setProject("pulse")
+      .setKey(appwriteKey)
+  : null;
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-11-20.acacia",
-});
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-
-const databases = new Databases(client);
+const teams = client ? new Teams(client) : null;
+const databases = client ? new Databases(client) : null;
+const stripe = stripeKey
+  ? new Stripe(stripeKey, {
+      apiVersion: "2024-11-20.acacia",
+    })
+  : null;
 
 export async function POST(req: Request) {
+  if (!stripe || !teams || !databases || !webhookSecret) {
+    return NextResponse.json(
+      { error: "Serviços necessários não estão configurados" },
+      { status: 503 }
+    );
+  }
+
   try {
     const body = await req.text();
     const signature = req.headers.get("stripe-signature")!;

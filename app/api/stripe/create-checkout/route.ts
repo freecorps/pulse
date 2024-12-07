@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-11-20.acacia",
-});
+const stripeKey = process.env.STRIPE_SECRET_KEY;
+const stripe = stripeKey
+  ? new Stripe(stripeKey, {
+      apiVersion: "2024-11-20.acacia",
+    })
+  : null;
 
 export async function POST(req: Request) {
+  if (!stripe) {
+    return NextResponse.json(
+      { error: "Serviço de pagamento não está configurado" },
+      { status: 503 }
+    );
+  }
+
   try {
     const { userId, userEmail, planType, successUrl, cancelUrl } =
       await req.json();
