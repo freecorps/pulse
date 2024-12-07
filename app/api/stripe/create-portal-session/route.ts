@@ -2,17 +2,13 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { Client, Databases, Query } from "node-appwrite";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY não está definida");
-}
-
 const client = new Client()
   .setEndpoint("https://appwrite.freecorps.xyz/v1")
   .setProject("pulse")
   .setKey(process.env.APPWRITE_API_KEY!);
 
 const databases = new Databases(client);
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-11-20.acacia",
 });
 
