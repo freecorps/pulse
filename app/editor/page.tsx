@@ -9,6 +9,17 @@ import { toast } from "sonner";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Newspaper, GamepadIcon, Users } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Stats {
   posts: number;
@@ -51,6 +62,17 @@ export default function EditorIndex() {
 
     fetchData();
   }, []);
+
+  const handleDelete = async (postId: string) => {
+    try {
+      await databases.deleteDocument("News", "posts", postId);
+      setRecentPosts(recentPosts.filter((post) => post.$id !== postId));
+      toast.success("Notícia excluída com sucesso!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao excluir a notícia");
+    }
+  };
 
   if (loading) {
     return (
@@ -175,12 +197,37 @@ export default function EditorIndex() {
                     </p>
                   </div>
                 </div>
-                <Button
-                  variant="outline"
-                  onClick={() => router.push(`/editor/${post.$id}`)}
-                >
-                  Editar
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => router.push(`/editor/${post.$id}`)}
+                  >
+                    Editar
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive">Excluir</Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja excluir a notícia &ldquo;
+                          {post.title}
+                          &rdquo;? Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(post.$id)}
+                        >
+                          Excluir
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </CardContent>
             </Card>
           ))}

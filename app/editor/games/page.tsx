@@ -6,6 +6,17 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Image from "next/image";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function GamesIndex() {
   const router = useRouter();
@@ -27,6 +38,17 @@ export default function GamesIndex() {
 
     fetchGames();
   }, []);
+
+  const handleDelete = async (gameId: string) => {
+    try {
+      await databases.deleteDocument("News", "games", gameId);
+      setGames(games.filter((game) => game.$id !== gameId));
+      toast.success("Jogo excluído com sucesso!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao excluir o jogo");
+    }
+  };
 
   if (loading) return <div>Carregando...</div>;
 
@@ -63,12 +85,34 @@ export default function GamesIndex() {
                 </p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => router.push(`/editor/games/${game.$id}`)}
-            >
-              Editar
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => router.push(`/editor/games/${game.$id}`)}
+              >
+                Editar
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">Excluir</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tem certeza que deseja excluir o jogo &ldquo;{game.name}
+                      &rdquo;? Esta ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleDelete(game.$id)}>
+                      Excluir
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
         ))}
 
