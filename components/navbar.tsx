@@ -12,7 +12,7 @@ import {
 import { useAuthStore } from "@/app/stores/AuthStore";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./modeTogle";
-import { LogOut, Menu, Settings, User } from "lucide-react";
+import { LogOut, Menu, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +28,7 @@ import { SearchCommand } from "./search-command";
 import { useState, useEffect } from "react";
 import { Query } from "appwrite";
 import { teams } from "@/app/appwrite";
+import Image from "next/image";
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
@@ -191,12 +192,6 @@ function UserMenu({ user, logout }: UserMenuProps) {
               <span>Perfil</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="./settings" className="flex items-center">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Configurações</span>
-            </Link>
-          </DropdownMenuItem>
         </DropdownMenuGroup>
         {(isEditor || isPremium) && (
           <>
@@ -245,7 +240,7 @@ function UserMenu({ user, logout }: UserMenuProps) {
 
 function Logo(props: React.HTMLAttributes<HTMLImageElement>) {
   return (
-    <img
+    <Image
       {...props}
       src="/favicon.ico"
       alt="Logo do site"

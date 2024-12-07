@@ -6,10 +6,10 @@ import Link from "next/link";
 import { MessageCircle, Plus } from "lucide-react";
 import { useAuthStore } from "@/app/stores/AuthStore";
 import { Query } from "appwrite";
-import type { ForumPost } from "@/types/appwrite";
+import type { ForumPosts } from "@/types/appwrite";
 
 export function ForumPosts() {
-  const [posts, setPosts] = useState<ForumPost[]>([]);
+  const [posts, setPosts] = useState<ForumPosts[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -43,7 +43,7 @@ export function ForumPosts() {
         })
       );
 
-      setPosts(postsWithCommentCounts as ForumPost[]);
+      setPosts(postsWithCommentCounts as unknown as ForumPosts[]);
       setTotalPages(Math.ceil(response.total / POSTS_PER_PAGE));
     } catch (error) {
       console.error("Erro ao carregar posts:", error);

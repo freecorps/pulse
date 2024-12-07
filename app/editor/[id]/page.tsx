@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { use } from "react";
+import { FileInput } from "@/components/ui/file-input/FileInput";
 
 interface EditPostProps {
   params: Promise<{ id: string }>;
@@ -131,10 +132,10 @@ export default function EditPost({ params }: EditPostProps) {
 
           <div className="space-y-2">
             <Label htmlFor="imageURL">URL da Imagem</Label>
-            <Input
-              id="imageURL"
+            <FileInput
               value={post.imageURL}
-              onChange={(e) => handleFieldUpdate("imageURL", e.target.value)}
+              onChange={(value) => handleFieldUpdate("imageURL", value)}
+              placeholder="Selecione ou cole o link da imagem de capa"
             />
           </div>
 

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
+import NextImage from "next/image";
 
 export default function NewsPostPageID() {
   const { id } = useParams();
@@ -50,7 +51,7 @@ export default function NewsPostPageID() {
         <div className="flex flex-col items-center">
           <div className="relative w-full flex justify-center mb-16">
             <div className="w-full max-w-7xl h-64 overflow-hidden rounded-lg">
-              <img
+              <NextImage
                 src={post.imageURL}
                 alt={post.title}
                 className="w-full h-full object-cover filter blur-sm scale-105"
@@ -58,7 +59,7 @@ export default function NewsPostPageID() {
             </div>
 
             <div className="absolute top-8 w-full max-w-4xl">
-              <img
+              <NextImage
                 src={post.imageURL}
                 alt={post.title}
                 className="w-full max-h-80 object-cover rounded-lg shadow-lg"

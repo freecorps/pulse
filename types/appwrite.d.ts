@@ -1,5 +1,18 @@
 import type { Models } from "appwrite";
 
+export interface ForumPosts extends Models.Document {
+  title: string;
+  content: string;
+  description?: string;
+  comments?: Comments[];
+}
+
+export interface Comments extends Models.Document {
+  content: string;
+  userId: string;
+  posts?: ForumPosts[];
+}
+
 export interface Posts extends Models.Document {
   title: string;
   imageURL: string;
@@ -23,22 +36,4 @@ export interface Games extends Models.Document {
   abbreviation?: string;
   posts?: Posts;
   IamgeURLUpper?: string;
-}
-
-export interface Comment extends Models.Document {
-  content: string;
-  postId: string;
-  userId: string;
-  user?: {
-    name: string;
-  };
-}
-
-export interface ForumPost extends Models.Document {
-  title: string;
-  description?: string;
-  content: string;
-  userId: string;
-  comments?: Comment[];
-  commentCount?: number;
 }

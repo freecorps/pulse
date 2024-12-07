@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { ID, Permission, Role } from "appwrite";
+import { FileInput } from "@/components/ui/file-input/FileInput";
 
 const initialPost: Partial<Posts> = {
   title: "",
@@ -209,11 +210,10 @@ export default function CreatePost() {
 
           <div className="space-y-2">
             <Label htmlFor="imageURL">URL da Imagem *</Label>
-            <Input
-              id="imageURL"
-              value={post.imageURL}
-              onChange={(e) => handleFieldUpdate("imageURL", e.target.value)}
-              placeholder="Cole o link da imagem de capa"
+            <FileInput
+              value={post.imageURL || ""}
+              onChange={(value) => handleFieldUpdate("imageURL", value)}
+              placeholder="Selecione ou cole o link da imagem de capa"
             />
           </div>
 

@@ -16,6 +16,7 @@ import { databases } from "@/app/appwrite";
 import { Query } from "appwrite";
 import { DialogTitle } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import Image from "next/image";
 
 interface SearchResult {
   $id: string;
@@ -128,7 +129,7 @@ export function SearchCommand() {
                 className="flex items-center gap-4 p-2"
               >
                 <div className="flex-shrink-0 w-12 h-12 relative rounded-md overflow-hidden">
-                  <img
+                  <Image
                     src={item.imageURL}
                     alt={item.title}
                     className="object-cover w-full h-full"

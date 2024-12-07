@@ -10,6 +10,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Posts, Editors } from "@/types/appwrite";
 import { Query } from "appwrite";
+import Image from "next/image";
 
 export default function EditorPostsPage() {
   const { id } = useParams();
@@ -98,7 +99,7 @@ export default function EditorPostsPage() {
                 <CardContent className="p-0">
                   <div className="flex flex-col md:flex-row">
                     <div className="w-full md:w-1/3 relative aspect-video md:aspect-square">
-                      <img
+                      <Image
                         src={post.imageURL}
                         alt={post.title}
                         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"

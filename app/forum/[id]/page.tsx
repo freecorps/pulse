@@ -9,13 +9,13 @@ import { toast } from "sonner";
 import { ID, Permission, Role } from "appwrite";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import type { ForumPost } from "@/types/appwrite";
+import { ForumPosts } from "@/types/appwrite";
 
 export default function ForumPost() {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuthStore();
-  const [post, setPost] = useState<ForumPost | null>(null);
+  const [post, setPost] = useState<ForumPosts | null>(null);
   const [newComment, setNewComment] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,7 +31,7 @@ export default function ForumPost() {
         "posts",
         params.id as string
       );
-      setPost(response as ForumPost);
+      setPost(response as ForumPosts);
     } catch (error) {
       console.error("Erro ao carregar post:", error);
       toast.error("Erro ao carregar o post");

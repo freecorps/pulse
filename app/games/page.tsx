@@ -12,14 +12,13 @@ export default function GamesPage() {
 
   useEffect(() => {
     async function fetchData() {
-      databases
-        .listDocuments("news", "games")
-        .then((response) => {
-          setGames(response.documents as Games[]);
-        })
-        .catch(() => {
-          toast.error("Erro ao buscar jogos");
-        });
+      try {
+        const response = await databases.listDocuments("news", "games");
+        setGames(response.documents as Games[]);
+      } catch (error) {
+        toast.error("Erro ao buscar jogos");
+        console.log(error);
+      }
     }
     fetchData();
   }, []);
@@ -27,19 +26,18 @@ export default function GamesPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div className="mb-24 mt-24">
-        <FocusCards
-          cards={games.map((game) => {
-            return {
+      <main className="flex-1">
+        <div className="mb-24 mt-24">
+          <FocusCards
+            cards={games.map((game) => ({
               title: game.name,
               src: game.IamgeURLUpper || game.imageURL,
-            };
-          })}
-        />
-      </div>
-      <div>
-        <Footer />
-      </div>
+              href: `/games/${game.$id}`,
+            }))}
+          />
+        </div>
+      </main>
+      <Footer />
     </div>
   );
 }
