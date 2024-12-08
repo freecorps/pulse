@@ -3,46 +3,36 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FileIcon } from "lucide-react";
 import { useAuthStore } from "@/app/stores/AuthStore";
-import { teams } from "@/app/appwrite";
-import { Query } from "appwrite";
+import { checkUserBucket } from "@/app/utils/user-bucket";
 import { FileModal } from "./FileModal";
 
 interface FileInputProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  bucketId?: string;
 }
 
-export function FileInput({
-  value,
-  onChange,
-  placeholder,
-  bucketId = "userFiles",
-}: FileInputProps) {
+export function FileInput({ value, onChange, placeholder }: FileInputProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditor, setIsEditor] = useState(false);
+  const [bucketId, setBucketId] = useState<string | null>(null);
   const { user } = useAuthStore();
 
   useEffect(() => {
-    async function checkEditorPermission() {
-      if (!user) return;
-
-      try {
-        const membershipList = await teams.listMemberships("editor", [
-          Query.equal("userId", user.$id),
-        ]);
-        setIsEditor(membershipList.total > 0);
-      } catch (error) {
-        console.error("Erro ao verificar permissões:", error);
-        setIsEditor(false);
+    async function initializeBucket() {
+      if (user) {
+        try {
+          const userBucketId = await checkUserBucket(user.$id);
+          setBucketId(userBucketId);
+        } catch (error) {
+          console.error("Erro ao inicializar bucket:", error);
+        }
       }
     }
 
-    checkEditorPermission();
+    initializeBucket();
   }, [user]);
 
-  if (!isEditor) {
+  if (!user || !bucketId) {
     return (
       <Input
         type="text"

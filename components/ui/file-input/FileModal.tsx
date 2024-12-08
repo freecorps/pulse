@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { storage, ID } from "@/app/appwrite";
-import { Permission, Role } from "appwrite";
 import {
   Dialog,
   DialogContent,
@@ -92,18 +91,17 @@ export function FileModal({
       return;
     }
 
+    if (file.size > 10485760) {
+      // 10MB
+      toast.error("O arquivo deve ter no máximo 10MB");
+      return;
+    }
+
     setIsUploading(true);
     const fileId = ID.unique();
 
     toast.promise(
-      storage
-        .createFile(bucketId, fileId, file, [
-          Permission.read(Role.any()),
-          Permission.write(Role.team("editor")),
-          Permission.update(Role.team("editor")),
-          Permission.delete(Role.team("editor")),
-        ])
-        .then(() => loadFiles()),
+      storage.createFile(bucketId, fileId, file).then(() => loadFiles()),
       {
         loading: "Enviando arquivo...",
         success: "Arquivo enviado com sucesso!",

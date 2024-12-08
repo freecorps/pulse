@@ -23,6 +23,7 @@ import ProfilePictureUpload from "@/components/profilePictureUpload";
 import { MultiSelect } from "@/components/multi-select";
 import { databases } from "@/app/appwrite";
 import { Games } from "@/types/appwrite";
+import { checkUserBucket } from "@/app/utils/user-bucket";
 
 const profileSchema = z.object({
   name: z.string().min(2, "O nome deve ter pelo menos 2 caracteres"),
@@ -71,6 +72,7 @@ export default function Profile() {
       checkMfaStatus();
       setProfilePicture(user.prefs?.profilePictureUrl);
       fetchGames();
+      checkUserBucket(user.$id).catch(console.error);
     }
   }, [user]);
 
@@ -267,15 +269,31 @@ export default function Profile() {
       <Navbar />
       <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
         <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full max-w-3xl">
-          <ProfilePictureUpload
-            profilePicture={profilePicture}
-            userId={user?.$id}
-            onUpdateProfilePicture={async (fileUrl, fileId) => {
-              await updateProfilePicture(fileUrl, fileId);
-              setProfilePicture(fileUrl);
-            }}
-            userPrefs={user?.prefs}
-          />
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>
+                <div className="flex flex-col items-center">
+                  Foto de Perfil
+                  <div className="text-sm text-muted-foreground mt-1">
+                    clique no icone ou digite o link de uma imagem para fazer o
+                    upload
+                  </div>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ProfilePictureUpload
+                profilePicture={profilePicture}
+                userId={user?.$id}
+                onUpdateProfilePicture={async (fileUrl, fileId) => {
+                  await updateProfilePicture(fileUrl, fileId);
+                  setProfilePicture(fileUrl);
+                }}
+                userPrefs={user?.prefs}
+              />
+            </CardContent>
+          </Card>
+
           <Card className="w-full">
             <CardHeader>
               <CardTitle>Profile</CardTitle>
