@@ -11,16 +11,51 @@ import { useEffect, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
+import Highlight from "@tiptap/extension-highlight";
+import Typography from "@tiptap/extension-typography";
 import NextImage from "next/image";
+
+interface Editor {
+  name: string;
+  imageURL: string;
+}
+
+interface Game {
+  name: string;
+}
+
+interface Post {
+  $id: string;
+  $createdAt: string;
+  $updatedAt: string;
+  title: string;
+  content: string;
+  imageURL: string;
+  editors: Editor;
+  games: Game;
+}
 
 export default function NewsPostPageID() {
   const { id } = useParams();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [post, setPost] = useState<any | null>(null);
+  const [post, setPost] = useState<Post | null>(null);
 
   const editor = useEditor({
-    extensions: [StarterKit, Image],
+    extensions: [
+      StarterKit,
+      Highlight,
+      Typography,
+      Image.configure({
+        HTMLAttributes: {
+          class: "rounded-lg",
+        },
+      }),
+    ],
     editable: false,
+    editorProps: {
+      attributes: {
+        class: "prose prose-lg dark:prose-invert max-w-none focus:outline-none",
+      },
+    },
   });
 
   useEffect(() => {
@@ -28,12 +63,19 @@ export default function NewsPostPageID() {
       if (!id) return;
       try {
         const data = await databases.getDocument("News", "posts", id as string);
-        setPost(data);
+        setPost(data as unknown as Post);
 
         // Atualizar o conteúdo do editor
         if (editor && data.content) {
-          const parsedContent = JSON.parse(data.content);
-          editor.commands.setContent(parsedContent);
+          let parsedContent;
+          try {
+            parsedContent = JSON.parse(data.content);
+            editor.commands.setContent(parsedContent);
+          } catch (error) {
+            console.error("Error parsing content:", error);
+            // Se falhar ao fazer parse como JSON, tenta renderizar como Markdown
+            editor.commands.setContent(data.content);
+          }
         }
       } catch (error) {
         console.error("Error fetching post:", error);

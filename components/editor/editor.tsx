@@ -6,12 +6,19 @@ import React, { useEffect } from "react";
 import Image from "@tiptap/extension-image";
 import { HelpCircle } from "lucide-react";
 import { SlashCommands } from "./extensions/SlashCommands";
+import MarkdownIt from "markdown-it";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+
+import Highlight from "@tiptap/extension-highlight";
+import Typography from "@tiptap/extension-typography";
+
+// Inicializa o parser markdown
+const md = new MarkdownIt();
 
 const SyncStatus = ({ status }: { status: "saved" | "saving" | "error" }) => {
   const statusMap = {
@@ -61,6 +68,8 @@ const TipTapEditor = ({ content, onUpdate, syncStatus }: TipTapEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
+      Highlight,
+      Typography,
       Image.configure({
         HTMLAttributes: {
           class: "rounded-lg",
@@ -76,6 +85,23 @@ const TipTapEditor = ({ content, onUpdate, syncStatus }: TipTapEditorProps) => {
     editorProps: {
       attributes: {
         class: "prose prose-sm dark:prose-invert max-w-none focus:outline-none",
+      },
+      handlePaste: (view, event) => {
+        const text = event.clipboardData?.getData("text/plain");
+
+        if (text && /[*#`>-]/.test(text)) {
+          event.preventDefault();
+
+          // Converte Markdown para HTML
+          const html = md.render(text);
+
+          // Insere o HTML convertido
+          editor?.commands.insertContent(html);
+
+          return true;
+        }
+
+        return false;
       },
     },
   });
