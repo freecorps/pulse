@@ -24,7 +24,7 @@ export async function POST(request: Request) {
         bucketId,
         exists: true,
       });
-    } catch (error) {
+    } catch {
       // Se o bucket não existir, cria um novo
       try {
         await storage.createBucket(
@@ -45,8 +45,12 @@ export async function POST(request: Request) {
           true, // encryption
           true // antivirus
         );
-      } catch (errorCreateBucket) {
-        console.error("Erro ao criar bucket:", errorCreateBucket);
+      } catch (error) {
+        console.error("Erro ao criar bucket:", error);
+        return NextResponse.json(
+          { error: "Erro ao criar bucket do usuário" },
+          { status: 500 }
+        );
       }
 
       return NextResponse.json({
@@ -85,7 +89,7 @@ export async function GET(request: Request) {
         bucketId,
         bucket,
       });
-    } catch (error) {
+    } catch {
       return NextResponse.json({
         exists: false,
         bucketId,
