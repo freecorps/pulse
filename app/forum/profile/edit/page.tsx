@@ -13,6 +13,7 @@ import { FileInput } from "@/components/ui/file-input/FileInput";
 import { Perfil } from "@/typesForum/appwrite";
 import { getUserProfile } from "../../utils/profile";
 import { Loader2 } from "lucide-react";
+import { checkUserBucket } from "@/app/utils/user-bucket";
 
 interface ProfileForm {
   handler: string;
@@ -30,6 +31,7 @@ export default function EditForumProfile() {
   useEffect(() => {
     if (user) {
       loadProfile();
+      checkUserBucket(user.$id).catch(console.error);
     }
   }, [user]);
 
@@ -150,7 +152,6 @@ export default function EditForumProfile() {
               value={form.imgURL}
               onChange={(value) => handleFieldUpdate("imgURL", value)}
               placeholder="Selecione ou cole o link da sua foto de perfil"
-              bucketId="forumFiles"
             />
             {form.imgURL && (
               <div className="mt-2">

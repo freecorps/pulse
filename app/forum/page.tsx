@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 export default function Forum() {
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1 bg-gradient-to-b from-background to-secondary/20">
+      <main className="flex-1">
         <div className="container max-w-6xl py-8 px-4 space-y-12">
           {/* Hero Section */}
           <div className="text-center space-y-6">

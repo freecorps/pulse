@@ -10,6 +10,7 @@ import { ID, Permission, Role, Query } from "appwrite";
 import { useAuthStore } from "@/app/stores/AuthStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileInput } from "@/components/ui/file-input/FileInput";
+import { checkUserBucket } from "@/app/utils/user-bucket";
 
 interface ProfileForm {
   handler: string;
@@ -31,6 +32,7 @@ export default function CreateForumProfile() {
   useEffect(() => {
     if (user) {
       checkExistingProfile();
+      checkUserBucket(user.$id).catch(console.error);
     }
   }, [user]);
 
@@ -143,7 +145,6 @@ export default function CreateForumProfile() {
               value={form.imgURL}
               onChange={(value) => handleFieldUpdate("imgURL", value)}
               placeholder="Selecione ou cole o link da sua foto de perfil"
-              bucketId="forumFiles"
             />
           </div>
         </div>
